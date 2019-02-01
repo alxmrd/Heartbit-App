@@ -7,7 +7,8 @@ import {
   Button,
   TouchableHighlight,
   Image,
-  Alert
+  Alert,
+  ScrollView
 } from "react-native";
 import { LinearGradient } from "expo";
 export default class LoginView extends Component {
@@ -37,7 +38,7 @@ export default class LoginView extends Component {
           }}
         >
           <View>
-            <Image source={require("../images/HeartBitLogo.png")} />
+            <Image source={require("../images/HBlogo1.png")} />
           </View>
           <View style={styles.inputContainer}>
             <Image
@@ -82,7 +83,9 @@ export default class LoginView extends Component {
             style={styles.buttonContainer}
             onPress={() => this.onClickListener("restore_password")}
           >
-            <Text>Ξεχάσατε τον κωδικό σας? Επαναφορά</Text>
+            <Text style={styles.retrieveText}>
+              Ξεχάσατε τον κωδικό σας; Επαναφορά
+            </Text>
           </TouchableHighlight>
         </LinearGradient>
       </View>
@@ -134,5 +137,8 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: "white"
+  },
+  retrieveText: {
+    color: "#808080"
   }
 });
