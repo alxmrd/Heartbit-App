@@ -1,26 +1,44 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { ExpoLinksView } from "@expo/samples";
+
 import { MapView } from "expo";
-import { Header } from "react-native-elements";
+
 export default class MapScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    state = {
+      marker: {}
+    };
+  }
+  static navigationOptions = {
+    title: "Χάρτης",
+    headerStyle: {
+      backgroundColor: "#46929a"
+    },
+    headerTintColor: "#fff",
+    headerTitleStyle: {
+      fontWeight: "bold"
+    }
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Header
-          leftComponent={{ icon: "menu", color: "#fff" }}
-          centerComponent={{ text: "MY TITLE", style: { color: "#fff" } }}
-          rightComponent={{ icon: "home", color: "#fff" }}
-        />
         <MapView
           style={styles.map}
           initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
+            latitude: 40.30069,
+            longitude: 21.78896,
+            latitudeDelta: 0.001,
+            longitudeDelta: 0.02
           }}
-        />
+        >
+          <MapView.Marker
+            coordinate={{ latitude: 40.30069, longitude: 21.78896 }}
+            title={"Koζάνη"}
+            //description={"desss"}
+          />
+        </MapView>
       </View>
     );
   }
