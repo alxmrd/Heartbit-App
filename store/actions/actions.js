@@ -21,11 +21,10 @@ export const login = (dispatch, volunteerData) => {
     body: JSON.stringify(volunteerData)
   })
     .then(result => result.json())
-
     .then(volunteers =>
       dispatch({
         type: LOGIN,
-        payload: volunteers.data
+        payload: volunteers
       })
     )
     .catch(error => {
