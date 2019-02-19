@@ -1,7 +1,8 @@
 import { LOGIN } from "../actions/types";
 import { CURRENT_LOCATION } from "../actions/types";
+import { FETCH_DEFIBRILLATORS } from "../actions/types";
 //import history from "../../history";
-
+import { AsyncStorage } from "react-native";
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -32,7 +33,26 @@ export const login = (dispatch, volunteerData) => {
       //history.push("/");
     });
 };
+export const fetchDefifrillators = token => dispatch => {
+  fetch(`https://alxmrd.com/api/defibrillators`, {
+    headers: {
+      ...headers,
+      Authorization: "Bearer " + token
+    }
+  })
+    .then(result => result.json())
 
+    .then(defibrillators =>
+      dispatch({
+        type: FETCH_DEFIBRILLATORS,
+        payload: defibrillators.data
+      })
+    )
+    .catch(error => {
+      alert("Απαιτείται σύνδεση");
+      // history.push("/");
+    });
+};
 export const currentLocation = (dispatch, currentLocation) => {
   dispatch({
     type: CURRENT_LOCATION,

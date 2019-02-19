@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TextInput,
-  Button,
   TouchableHighlight,
   Image,
   Alert
@@ -71,6 +70,9 @@ class LoginView extends Component {
     this.state = { username: "", password: "" };
     //asyncStorage.setItem("token", loginData.token);
   }
+  static navigationOptions = {
+    header: null
+  };
 
   componentDidUpdate(prevProps) {
     //Typical usage (don't forget to compare props):

@@ -7,6 +7,8 @@ import SettingsScreen from "./SettingsScreen";
 import { connect } from "react-redux";
 import { AsyncStorage } from "react-native";
 import navigation from "react-navigation";
+import { fetchDefifrillators } from "../store/actions/actions";
+
 class MapScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -40,6 +42,12 @@ class MapScreen extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setParams({ logout: this._logout });
+    this._getStorageValue();
+  }
+  async _getStorageValue() {
+    var token = await AsyncStorage.getItem("token");
+
+    this.props.onfetchDefibrillators(token);
   }
   _logout = async () => {
     try {
@@ -53,6 +61,7 @@ class MapScreen extends React.Component {
   };
 
   render() {
+    const { defibrillators } = this.props;
     return (
       <View style={styles.container}>
         <MapView
@@ -82,6 +91,19 @@ class MapScreen extends React.Component {
             //description={"desss"}
             image={require("../images/marker.png")}
           />
+          {defibrillators.map(item => (
+            <MapView.Marker
+              key={item.id}
+              // onClick={onMarkerClick}
+
+              title={item.model}
+              coordinate={{
+                latitude: item.latitude,
+                longitude: item.longitude
+              }}
+              image={require("../images/defibrillator.png")}
+            />
+          ))}
         </MapView>
         <SettingsScreen />
       </View>
@@ -109,10 +131,14 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  currentLocation: state.currentLocation
+  currentLocation: state.currentLocation,
+  defibrillators: state.defibrillators
+});
+const mapDispatchToProps = dispatch => ({
+  onfetchDefibrillators: token => dispatch(fetchDefifrillators(token))
 });
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(MapScreen);
