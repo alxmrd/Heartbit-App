@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Constants, MapView, Location, Permissions } from "expo";
-
-export default class App extends Component {
+import { connect } from "react-redux";
+import { currentLocation } from "../store/actions/actions";
+class CurrentLocation extends Component {
   state = {
     mapRegion: {
       latitude: 37.78825,
@@ -17,7 +18,13 @@ export default class App extends Component {
   componentDidMount() {
     this._getLocationAsync();
   }
-
+  componentDidUpdate(prevState) {
+    //Typical usage (don't forget to compare props):
+    if (this.state.location !== prevState.location) {
+      let location = this.state.location.coords;
+      this.props.onCurrentLocation(location);
+    }
+  }
   _handleMapRegionChange = mapRegion => {
     this.setState({ mapRegion });
   };
@@ -38,24 +45,10 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <MapView
-          style={{ alignSelf: "stretch", height: 200 }}
-          region={{
-            latitude: this.state.location.coords.latitude,
-            longitude: this.state.location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
-          }}
-          onRegionChange={this._handleMapRegionChange}
-        >
-          <MapView.Marker
-            coordinate={this.state.location.coords}
-            title="My Marker"
-            description="Some description"
-          />
-        </MapView>
-
-        <Text>Location: {this.state.locationResult}</Text>
+        <MapView.Marker
+          coordinate={this.state.location.coords}
+          title="Βρίσκεστε εδώ"
+        />
       </View>
     );
   }
@@ -77,3 +70,15 @@ const styles = StyleSheet.create({
     color: "#34495e"
   }
 });
+
+const mapStateToProps = state => ({
+  currentLocation: state.currentLocation
+});
+const mapDispatchToProps = dispatch => ({
+  onCurrentLocation: dataPouStelnw => currentLocation(dispatch, dataPouStelnw)
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CurrentLocation);

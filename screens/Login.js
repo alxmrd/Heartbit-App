@@ -12,6 +12,7 @@ import {
 import { LinearGradient } from "expo";
 import { connect } from "react-redux";
 import { login } from "../store/actions/actions";
+import { AsyncStorage } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -66,12 +67,20 @@ const styles = StyleSheet.create({
 class LoginView extends Component {
   constructor(props) {
     super(props);
-    state = {
-      username: "",
-      password: ""
-    };
+
+    this.state = { username: "", password: "" };
+    //asyncStorage.setItem("token", loginData.token);
   }
 
+  componentDidUpdate(prevProps) {
+    //Typical usage (don't forget to compare props):
+    if (
+      this.props.loginData.status !== prevProps.status &&
+      this.props.loginData.status === "success"
+    ) {
+      this.handleSuccessLogin();
+    }
+  }
   onClickListener = viewId => {
     Alert.alert("Alert", "Button pressed " + viewId);
   };
@@ -84,6 +93,26 @@ class LoginView extends Component {
     };
 
     this.props.onLogin(dataPouStelnw);
+  };
+
+  handleSuccessLogin = async () => {
+    try {
+      await AsyncStorage.setItem("token", this.props.loginData.token);
+
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (token !== null) {
+          // We have data!!
+          if (token) {
+            this.props.navigation.navigate("Map");
+          }
+        }
+      } catch (error) {
+        console.log("error on retrieving data");
+      }
+    } catch (error) {
+      console.log("error");
+    }
   };
 
   render() {

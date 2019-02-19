@@ -1,5 +1,5 @@
 import { LOGIN } from "../actions/types";
-import { AsyncStorage } from "react-native";
+import { CURRENT_LOCATION } from "../actions/types";
 //import history from "../../history";
 
 const headers = {
@@ -9,7 +9,7 @@ const headers = {
 };
 
 export const login = (dispatch, volunteerData) => {
-  fetch(`http://localhost:8080/api/mobilelogin`, {
+  fetch(`https://alxmrd.com/api/mobilelogin`, {
     method: "POST",
     cache: "no-cache",
     headers: {
@@ -31,4 +31,12 @@ export const login = (dispatch, volunteerData) => {
       alert(error);
       //history.push("/");
     });
+};
+
+export const currentLocation = (dispatch, currentLocation) => {
+  dispatch({
+    type: CURRENT_LOCATION,
+    payload: currentLocation
+  });
+  console.log("redux");
 };

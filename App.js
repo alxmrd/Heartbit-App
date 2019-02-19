@@ -4,7 +4,8 @@ import { AppLoading, Asset, Font, Icon } from "expo";
 import AppNavigator from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import store from "./store/store";
-
+import { Header } from "react-native-elements";
+import { Constants } from "expo";
 global.XMLHttpRequest = global.originalXMLHttpRequest
   ? global.originalXMLHttpRequest
   : global.XMLHttpRequest;
@@ -84,6 +85,7 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: Constants.statusBarHeight,
     backgroundColor: "#fff"
   }
 });

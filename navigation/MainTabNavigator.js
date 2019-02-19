@@ -4,7 +4,7 @@ import {
   createStackNavigator,
   createBottomTabNavigator
 } from "react-navigation";
-
+import Icon from "react-native-vector-icons/AntDesign";
 import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import MapScreen from "../screens/MapScreen";
@@ -17,6 +17,7 @@ const HomeStack = createStackNavigator({
 
 HomeStack.navigationOptions = {
   tabBarLabel: "Home",
+
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -55,10 +56,24 @@ SettingsStack.navigationOptions = {
     />
   )
 };
+const LoginStack = createStackNavigator({
+  Login: Login
+});
+
+LoginStack.navigationOptions = {
+  tabBarLabel: "Σύνδεση",
+  tabBarIcon: ({ focused }) => (
+    <Icon
+      focused={focused}
+      name={Platform.OS === "ios" ? "login" : "md-options"}
+      size={20}
+    />
+  )
+};
 
 export default createBottomTabNavigator({
   HomeStack,
   MapStack,
   SettingsStack,
-  Login
+  LoginStack
 });

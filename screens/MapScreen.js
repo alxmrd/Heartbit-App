@@ -1,23 +1,54 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-
+import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
-
-export default class MapScreen extends React.Component {
+import { Button } from "react-native-elements";
+import SettingsScreen from "./SettingsScreen";
+import { connect } from "react-redux";
+import { AsyncStorage } from "react-native";
+import navigation from "react-navigation";
+class MapScreen extends React.Component {
   constructor(props) {
     super(props);
     state = {
-      marker: {}
+      marker: {},
+      redirect: false
     };
   }
-  static navigationOptions = {
-    title: "Χάρτης",
-    headerStyle: {
-      backgroundColor: "#46929a"
-    },
-    headerTintColor: "#fff",
-    headerTitleStyle: {
-      fontWeight: "bold"
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "Χάρτης",
+      headerStyle: {
+        backgroundColor: "teal"
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        fontWeight: "bold"
+      },
+
+      headerRight: (
+        <Button
+          onPress={navigation.getParam("logout")}
+          title="Αποσύνδεση"
+          type="clear"
+          titleStyle={{ fontSize: 14, color: "#fff" }}
+          icon={<Icon name="sign-out" size={15} color="white" />}
+        />
+      )
+    };
+  };
+
+  componentDidMount() {
+    this.props.navigation.setParams({ logout: this._logout });
+  }
+  _logout = async () => {
+    try {
+      const token = await AsyncStorage.removeItem("token");
+      if (token == null) {
+        this.props.navigation.navigate("Login");
+      }
+    } catch (error) {
+      console.log("error on removing data");
     }
   };
 
@@ -38,7 +69,21 @@ export default class MapScreen extends React.Component {
             title={"Koζάνη"}
             //description={"desss"}
           />
+          <MapView.Marker
+            coordinate={{
+              latitude: this.props.currentLocation.latitude
+                ? this.props.currentLocation.latitude
+                : 0,
+              longitude: this.props.currentLocation.longitude
+                ? this.props.currentLocation.longitude
+                : 0
+            }}
+            title={"Bρίσκεστε εδώ"}
+            //description={"desss"}
+            image={require("../images/marker.png")}
+          />
         </MapView>
+        <SettingsScreen />
       </View>
     );
   }
@@ -62,3 +107,12 @@ const styles = StyleSheet.create({
     right: 0
   }
 });
+
+const mapStateToProps = state => ({
+  currentLocation: state.currentLocation
+});
+
+export default connect(
+  mapStateToProps,
+  null
+)(MapScreen);
