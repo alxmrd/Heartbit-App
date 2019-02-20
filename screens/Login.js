@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo";
 import { connect } from "react-redux";
-import { login } from "../store/actions/actions";
+import { login, successLogin } from "../store/actions/actions";
 import { AsyncStorage } from "react-native";
 
 const styles = StyleSheet.create({
@@ -100,11 +100,12 @@ class LoginView extends Component {
   handleSuccessLogin = async () => {
     try {
       await AsyncStorage.setItem("token", this.props.loginData.token);
-
+      await AsyncStorage.setItem("username", this.props.loginData.username);
       try {
         const token = await AsyncStorage.getItem("token");
+        const username = await AsyncStorage.getItem("username");
         if (token !== null) {
-          // We have data!!
+          this.props.onSuccessLogin(username, token);
           if (token) {
             this.props.navigation.navigate("Map");
           }
@@ -189,7 +190,8 @@ const mapStateToProps = state => ({
   loginData: state.loginData
 });
 const mapDispatchToProps = dispatch => ({
-  onLogin: dataPouStelnw => login(dispatch, dataPouStelnw)
+  onLogin: dataPouStelnw => login(dispatch, dataPouStelnw),
+  onSuccessLogin: (username, token) => dispatch(successLogin(username, token))
 });
 
 export default connect(

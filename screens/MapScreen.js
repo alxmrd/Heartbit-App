@@ -3,11 +3,12 @@ import { View, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
-import SettingsScreen from "./SettingsScreen";
+
 import { connect } from "react-redux";
 import { AsyncStorage } from "react-native";
 import navigation from "react-navigation";
 import { fetchDefifrillators } from "../store/actions/actions";
+import CurrentLocation from "../components/CurrentLocation";
 
 class MapScreen extends React.Component {
   constructor(props) {
@@ -25,7 +26,8 @@ class MapScreen extends React.Component {
       },
       headerTintColor: "#fff",
       headerTitleStyle: {
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontFamily: "space-mono"
       },
 
       headerRight: (
@@ -33,7 +35,7 @@ class MapScreen extends React.Component {
           onPress={navigation.getParam("logout")}
           title="Αποσύνδεση"
           type="clear"
-          titleStyle={{ fontSize: 14, color: "#fff" }}
+          titleStyle={{ fontSize: 14, color: "#fff", fontFamily: "space-mono" }}
           icon={<Icon name="sign-out" size={15} color="white" />}
         />
       )
@@ -101,11 +103,11 @@ class MapScreen extends React.Component {
                 latitude: item.latitude,
                 longitude: item.longitude
               }}
-              image={require("../images/defibrillator.png")}
+              image={require("../images/defibrillator2.png")}
             />
           ))}
         </MapView>
-        <SettingsScreen />
+        <CurrentLocation />
       </View>
     );
   }

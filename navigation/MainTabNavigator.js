@@ -6,25 +6,21 @@ import {
 } from "react-navigation";
 
 import TabBarIcon from "../components/TabBarIcon";
-import HomeScreen from "../screens/HomeScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import MapScreen from "../screens/MapScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
-const HomeStack = createStackNavigator({
-  Home: HomeScreen
+const ProfileStack = createStackNavigator({
+  Profile: ProfileScreen
 });
 
-HomeStack.navigationOptions = {
-  tabBarLabel: "Home",
+ProfileStack.navigationOptions = {
+  tabBarLabel: "Προφίλ",
 
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={
-        Platform.OS === "ios"
-          ? `ios-information-circle${focused ? "" : "-outline"}`
-          : "md-information-circle"
-      }
+      name={Platform.OS === "ios" ? "ios-contact" : "md-contact"}
     />
   )
 };
@@ -33,11 +29,12 @@ const MapStack = createStackNavigator({
   Map: MapScreen
 });
 MapStack.navigationOptions = {
-  tabBarLabel: "Maps",
+  tabBarLabel: "Xάρτες",
+
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-link" : "md-link"}
+      name={Platform.OS === "ios" ? "ios-map" : "md-map"}
     />
   )
 };
@@ -47,17 +44,17 @@ const SettingsStack = createStackNavigator({
 });
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: "Settings",
+  tabBarLabel: "Ιστορικό",
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+      name={Platform.OS === "ios" ? "ios-time" : "md-time"}
     />
   )
 };
 
 export default createBottomTabNavigator({
-  HomeStack,
+  ProfileStack,
   MapStack,
   SettingsStack
 });

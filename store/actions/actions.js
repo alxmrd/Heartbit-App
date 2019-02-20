@@ -1,6 +1,7 @@
 import { LOGIN } from "../actions/types";
 import { CURRENT_LOCATION } from "../actions/types";
 import { FETCH_DEFIBRILLATORS } from "../actions/types";
+import { LOGGED_IN_USER } from "../actions/types";
 //import history from "../../history";
 import { AsyncStorage } from "react-native";
 const headers = {
@@ -31,6 +32,29 @@ export const login = (dispatch, volunteerData) => {
     .catch(error => {
       alert(error);
       //history.push("/");
+    });
+};
+export const successLogin = (username, token) => dispatch => {
+  fetch(`https://alxmrd.com/api/volunteerlogin/success?input=${username}`, {
+    method: "GET",
+    cache: "no-cache",
+    headers: {
+      ...headers,
+      Authorization: "Bearer " + token
+    },
+
+    referrer: "no-referrer"
+  })
+    .then(result => result.json())
+    .then(res => {
+      dispatch({
+        type: LOGGED_IN_USER,
+        payload: res
+      });
+    })
+
+    .catch(error => {
+      alert(error, "SERVER error 500 ");
     });
 };
 export const fetchDefifrillators = token => dispatch => {
