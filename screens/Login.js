@@ -10,8 +10,9 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo";
 import { connect } from "react-redux";
-import { login, successLogin } from "../store/actions/actions";
+import { login, successLogin, clearLoginData } from "../store/actions/actions";
 import { AsyncStorage } from "react-native";
+import SnackBar from "react-native-snackbar-component";
 
 const styles = StyleSheet.create({
   container: {
@@ -119,6 +120,7 @@ class LoginView extends Component {
   };
 
   render() {
+    const { loginData } = this.props;
     return (
       <View style={styles.container}>
         <LinearGradient
@@ -182,6 +184,16 @@ class LoginView extends Component {
             </Text>
           </TouchableHighlight>
         </LinearGradient>
+        <SnackBar
+          visible={loginData.status === "error"}
+          textMessage="Πληκτρολογήσατε κάτι λαθος, Προσπαθείστε ξανα!"
+          actionHandler={() => {
+            this.props.onClear(loginData);
+          }}
+          autoHidingTime={7000}
+          bottom={1}
+          actionText="x"
+        />
       </View>
     );
   }
@@ -191,6 +203,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
   onLogin: dataPouStelnw => login(dispatch, dataPouStelnw),
+  onClear: loginData => clearLoginData(dispatch, loginData),
   onSuccessLogin: (username, token) => dispatch(successLogin(username, token))
 });
 

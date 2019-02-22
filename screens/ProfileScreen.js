@@ -58,8 +58,8 @@ class ProfileScreen extends React.Component {
   render() {
     const { user } = this.props;
     return (
-      <View style={styles.container}>
-        <Card>
+      <View>
+        <Card containerStyle={{ padding: 0 }}>
           <View>
             <ListItem
               leftAvatar={
@@ -70,15 +70,86 @@ class ProfileScreen extends React.Component {
                   color="#008080"
                 />
               }
-              title="Όνομα Χρήστη"
-              subtitle={user.username}
+              title={
+                <View>
+                  <Text
+                    style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
+                  >
+                    Προφίλ Εθελοντή
+                  </Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 10 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Όνομα Χρήστη</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.username}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Όνομα</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.name}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Eπώνυμο</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.surname}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>E-mail</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.email}</Text>
+                </View>
+              }
             />
           </View>
           <Divider
             style={{ backgroundColor: "blue" }}
             style={{ marginBottom: 10, marginTop: 10 }}
           />
-          <Text style={{ marginBottom: 10 }}>
+          {/* <Text style={{ marginBottom: 10 }}>
             The idea with React Native Elements is more about component
             structure than actual design.
           </Text>
@@ -92,7 +163,7 @@ class ProfileScreen extends React.Component {
               marginBottom: 0
             }}
             title="VIEW NOW"
-          />
+          /> */}
         </Card>
       </View>
     );
@@ -105,6 +176,23 @@ const styles = StyleSheet.create({
 
     justifyContent: "flex-end",
     alignItems: "center"
+  },
+
+  subtitleView: {
+    flexDirection: "row",
+    paddingLeft: 10,
+    paddingTop: 5
+  },
+  ratingText: {
+    paddingLeft: 10,
+    color: "grey",
+    fontSize: 20
+  },
+  titleView: {
+    color: "teal",
+    paddingLeft: 10,
+    fontWeight: "bold",
+    fontSize: 24
   }
 });
 

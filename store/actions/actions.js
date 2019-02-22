@@ -2,6 +2,7 @@ import { LOGIN } from "../actions/types";
 import { CURRENT_LOCATION } from "../actions/types";
 import { FETCH_DEFIBRILLATORS } from "../actions/types";
 import { LOGGED_IN_USER } from "../actions/types";
+import { CLEAR_LOGINDATA } from "../actions/types";
 //import history from "../../history";
 import { AsyncStorage } from "react-native";
 const headers = {
@@ -82,5 +83,11 @@ export const currentLocation = (dispatch, currentLocation) => {
     type: CURRENT_LOCATION,
     payload: currentLocation
   });
-  console.log("redux");
+};
+
+export const clearLoginData = (dispatch, LoginData) => {
+  dispatch({
+    type: CLEAR_LOGINDATA,
+    payload: LoginData
+  });
 };
