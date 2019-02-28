@@ -12,7 +12,7 @@ const headers = {
 };
 
 export const login = (dispatch, volunteerData) => {
-  fetch(`https://alxmrd.com/api/mobilelogin`, {
+  fetch(`http:localhost:8080/api/mobilelogin`, {
     method: "POST",
     cache: "no-cache",
     headers: {
@@ -36,7 +36,7 @@ export const login = (dispatch, volunteerData) => {
     });
 };
 export const successLogin = (username, token) => dispatch => {
-  fetch(`https://alxmrd.com/api/volunteerlogin/success?input=${username}`, {
+  fetch(`http:localhost:8080/api/volunteerlogin/success?input=${username}`, {
     method: "GET",
     cache: "no-cache",
     headers: {
@@ -59,7 +59,7 @@ export const successLogin = (username, token) => dispatch => {
     });
 };
 export const fetchDefifrillators = token => dispatch => {
-  fetch(`https://alxmrd.com/api/defibrillators`, {
+  fetch(`http://localhost:8080/api/defibrillators`, {
     headers: {
       ...headers,
       Authorization: "Bearer " + token

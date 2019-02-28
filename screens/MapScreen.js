@@ -3,12 +3,13 @@ import { View, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
-
+import Pusher from "pusher-js/react-native";
 import { connect } from "react-redux";
 import { AsyncStorage } from "react-native";
 import navigation from "react-navigation";
 import { fetchDefifrillators } from "../store/actions/actions";
 import CurrentLocation from "../components/CurrentLocation";
+import Echo from "laravel-echo";
 
 class MapScreen extends React.Component {
   constructor(props) {
@@ -45,6 +46,26 @@ class MapScreen extends React.Component {
   componentDidMount() {
     this.props.navigation.setParams({ logout: this._logout });
     this._getStorageValue();
+    Pusher.logToConsole = true;
+    // window.Echo = new Echo({
+    //   broadcaster: Pusher,
+    //   key: "2f7f2a748cacde676705",
+    //   cluster: "eu",
+    //   encrypted: true
+    // });
+
+    // window.Echo.channel("channel").listen("event", e => {
+    //   alert(JSON.stringify(e));
+    // });
+    var pusher = new Pusher("2f7f2a748cacde676705", {
+      cluster: "eu",
+      forceTLS: true
+    });
+
+    var channel = pusher.subscribe("channel");
+    channel.bind("event", function(data) {
+      alert(JSON.stringify(data));
+    });
   }
   async _getStorageValue() {
     var token = await AsyncStorage.getItem("token");
