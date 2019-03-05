@@ -4,12 +4,18 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
 import Pusher from "pusher-js/react-native";
-import { connect } from "react-redux";
+
 import { AsyncStorage } from "react-native";
-import navigation from "react-navigation";
-import { fetchDefifrillators } from "../store/actions/actions";
+import { connect } from "react-redux";
+import {
+  fetchDefifrillators,
+  messageReceive,
+  messageClean,
+  logout,
+  clearLoginData
+} from "../store/actions/actions";
 import CurrentLocation from "../components/CurrentLocation";
-import Echo from "laravel-echo";
+import SnackBar from "react-native-snackbar-component";
 
 class MapScreen extends React.Component {
   constructor(props) {
@@ -63,20 +69,24 @@ class MapScreen extends React.Component {
     });
 
     var channel = pusher.subscribe("channel");
-    channel.bind("event", function(data) {
-      alert(JSON.stringify(data));
+    channel.bind("event", data => {
+      this.props.onMessageReceive(data.message);
     });
   }
+
   async _getStorageValue() {
     var token = await AsyncStorage.getItem("token");
 
     this.props.onfetchDefibrillators(token);
   }
+
   _logout = async () => {
     try {
       const token = await AsyncStorage.removeItem("token");
       if (token == null) {
         this.props.navigation.navigate("Login");
+        this.props.onLogout(this.props.userData);
+        this.props.onClear(this.props.loginData);
       }
     } catch (error) {
       console.log("error on removing data");
@@ -84,14 +94,18 @@ class MapScreen extends React.Component {
   };
 
   render() {
-    const { defibrillators } = this.props;
+    const { defibrillators, message } = this.props;
     return (
       <View style={styles.container}>
         <MapView
           style={styles.map}
           initialRegion={{
-            latitude: 40.30069,
-            longitude: 21.78896,
+            latitude: this.props.currentLocation.latitude
+              ? this.props.currentLocation.latitude
+              : 40.30069,
+            longitude: this.props.currentLocation.longitude
+              ? this.props.currentLocation.longitude
+              : 21.78896,
             latitudeDelta: 0.001,
             longitudeDelta: 0.02
           }}
@@ -128,6 +142,16 @@ class MapScreen extends React.Component {
             />
           ))}
         </MapView>
+        <SnackBar
+          visible={message}
+          textMessage={"Νέο Μήνυμα:" + "   " + message}
+          actionHandler={() => {
+            this.props.onMessageClean(message);
+          }}
+          position="top"
+          top={1}
+          actionText="x"
+        />
         <CurrentLocation />
       </View>
     );
@@ -155,10 +179,17 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   currentLocation: state.currentLocation,
-  defibrillators: state.defibrillators
+  defibrillators: state.defibrillators,
+  message: state.message,
+  userData: state.loggedInVolunteerData,
+  loginData: state.loginData
 });
 const mapDispatchToProps = dispatch => ({
-  onfetchDefibrillators: token => dispatch(fetchDefifrillators(token))
+  onfetchDefibrillators: token => dispatch(fetchDefifrillators(token)),
+  onMessageClean: data => messageClean(dispatch, data),
+  onMessageReceive: data => messageReceive(dispatch, data),
+  onLogout: userData => logout(dispatch, userData),
+  onClear: loginData => clearLoginData(dispatch, loginData)
 });
 
 export default connect(

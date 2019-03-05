@@ -8,7 +8,9 @@ import {
   Platform
 } from "react-native";
 import { Constants, MapView } from "expo";
+import { logout, clearLoginData } from "../store/actions/actions";
 import MapViewDirections from "../components/MapViewDirections";
+import { connect } from "react-redux";
 
 // Using a local version here because we need it to import MapView from 'expo'
 
@@ -20,8 +22,7 @@ const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const GOOGLE_MAPS_APIKEY = "AIzaSyDPdPljOcPqSqZRJ7wgoa0NKME2iuBXjEg";
-
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
 
@@ -66,6 +67,18 @@ export default class App extends Component {
 
   onError = errorMessage => {
     Alert.alert(errorMessage);
+  };
+  _logout = async () => {
+    try {
+      const token = await AsyncStorage.removeItem("token");
+      if (token == null) {
+        this.props.navigation.navigate("Login");
+        this.props.onLogout(this.props.userData);
+        this.props.onClear(this.props.loginData);
+      }
+    } catch (error) {
+      console.log("error on removing data");
+    }
   };
 
   render() {
@@ -129,3 +142,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#ecf0f1"
   }
 });
+
+const mapStateToProps = state => ({
+  userData: state.loggedInVolunteerData,
+  loginData: state.loginData
+});
+
+const mapDispatchToProps = dispatch => ({
+  onLogout: userData => logout(dispatch, userData),
+  onClear: loginData => clearLoginData(dispatch, loginData)
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

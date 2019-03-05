@@ -74,7 +74,18 @@ class LoginView extends Component {
   static navigationOptions = {
     header: null
   };
+  componentDidMount() {
+    this._getStorageValue();
+    // console.log("id", Expo.Constants.installationId);
+    // console.log("token", Expo.Notifications.getExpoPushTokenAsync());
+  }
+  async _getStorageValue() {
+    var token = await AsyncStorage.getItem("token");
 
+    if (token) {
+      this.props.navigation.navigate("Map");
+    }
+  }
   componentDidUpdate(prevProps) {
     //Typical usage (don't forget to compare props):
     if (
@@ -96,6 +107,7 @@ class LoginView extends Component {
     };
 
     this.props.onLogin(dataPouStelnw);
+    this.setState({ username: "", password: "" });
   };
 
   handleSuccessLogin = async () => {
@@ -107,6 +119,7 @@ class LoginView extends Component {
         const username = await AsyncStorage.getItem("username");
         if (token !== null) {
           this.props.onSuccessLogin(username, token);
+
           if (token) {
             this.props.navigation.navigate("Map");
           }

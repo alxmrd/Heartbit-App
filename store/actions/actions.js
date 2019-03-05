@@ -3,6 +3,9 @@ import { CURRENT_LOCATION } from "../actions/types";
 import { FETCH_DEFIBRILLATORS } from "../actions/types";
 import { LOGGED_IN_USER } from "../actions/types";
 import { CLEAR_LOGINDATA } from "../actions/types";
+import { MESSAGE_RECEIVE } from "../actions/types";
+import { MESSAGE_CLEAN } from "../actions/types";
+import { LOGGED_OUT_USER } from "../actions/types";
 //import history from "../../history";
 import { AsyncStorage } from "react-native";
 const headers = {
@@ -12,7 +15,7 @@ const headers = {
 };
 
 export const login = (dispatch, volunteerData) => {
-  fetch(`http:localhost:8080/api/mobilelogin`, {
+  fetch(`http://localhost:8080/api/mobilelogin`, {
     method: "POST",
     cache: "no-cache",
     headers: {
@@ -35,8 +38,14 @@ export const login = (dispatch, volunteerData) => {
       //history.push("/");
     });
 };
+export const logout = (dispatch, userData) => {
+  dispatch({
+    type: LOGGED_OUT_USER,
+    payload: userData
+  });
+};
 export const successLogin = (username, token) => dispatch => {
-  fetch(`http:localhost:8080/api/volunteerlogin/success?input=${username}`, {
+  fetch(`http://localhost:8080/api/volunteerlogin/success?input=${username}`, {
     method: "GET",
     cache: "no-cache",
     headers: {
@@ -85,6 +94,19 @@ export const currentLocation = (dispatch, currentLocation) => {
   });
 };
 
+export const messageReceive = (dispatch, data) => {
+  dispatch({
+    type: MESSAGE_RECEIVE,
+    payload: data
+  });
+};
+
+export const messageClean = (dispatch, data) => {
+  dispatch({
+    type: MESSAGE_CLEAN,
+    payload: data
+  });
+};
 export const clearLoginData = (dispatch, LoginData) => {
   dispatch({
     type: CLEAR_LOGINDATA,

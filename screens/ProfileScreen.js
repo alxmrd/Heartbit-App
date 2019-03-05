@@ -6,7 +6,7 @@ import { Card, Button } from "react-native-elements";
 import { connect } from "react-redux";
 import { AsyncStorage } from "react-native";
 import { ListItem } from "react-native-elements";
-
+import { logout, clearLoginData } from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
 class ProfileScreen extends React.Component {
   constructor(props) {
@@ -49,6 +49,8 @@ class ProfileScreen extends React.Component {
       const token = await AsyncStorage.removeItem("token");
       if (token == null) {
         this.props.navigation.navigate("Login");
+        this.props.onLogout(this.props.userData);
+        this.props.onClear(this.props.loginData);
       }
     } catch (error) {
       console.log("error on removing data");
@@ -197,10 +199,17 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  user: state.loggedInVolunteerData
+  user: state.loggedInVolunteerData,
+  userData: state.loggedInVolunteerData,
+  loginData: state.loginData
+});
+
+const mapDispatchToProps = dispatch => ({
+  onLogout: userData => logout(dispatch, userData),
+  onClear: loginData => clearLoginData(dispatch, loginData)
 });
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(ProfileScreen);
