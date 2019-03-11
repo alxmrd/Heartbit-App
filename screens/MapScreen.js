@@ -4,7 +4,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
 import Pusher from "pusher-js/react-native";
-
+import getDirections from "react-native-google-maps-directions";
 import { AsyncStorage } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -16,6 +16,8 @@ import {
 } from "../store/actions/actions";
 import CurrentLocation from "../components/CurrentLocation";
 import SnackBar from "react-native-snackbar-component";
+
+import geolib from "geolib";
 
 class MapScreen extends React.Component {
   constructor(props) {
@@ -92,9 +94,41 @@ class MapScreen extends React.Component {
       console.log("error on removing data");
     }
   };
+  handleGetDirections = () => {
+    const data = {
+      source: {
+        latitude: this.props.currentLocation.latitude,
+        longitude: this.props.currentLocation.longitude
+      },
+
+      destination: {
+        latitude: 37.98381,
+        longitude: 23.727539
+      },
+
+      params: [
+        {
+          key: "travelmode",
+          value: "walking" // may be "walking", "bicycling" or "transit" as well
+        },
+        {
+          key: "waypoints",
+          value: "Δαυακη 15 κοζανη" // may be "walking", "bicycling" or "transit" as well
+        },
+
+        {
+          key: "dir_action",
+          value: "navigate" // this instantly initializes navigation using the given travel mode
+        }
+      ]
+    };
+
+    getDirections(data);
+  };
 
   render() {
     const { defibrillators, message } = this.props;
+
     return (
       <View style={styles.container}>
         <MapView
@@ -153,6 +187,7 @@ class MapScreen extends React.Component {
           actionText="x"
         />
         <CurrentLocation />
+        <Button onPress={this.handleGetDirections} title="Get Directions" />
       </View>
     );
   }

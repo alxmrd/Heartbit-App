@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "194011181818",
+    "firebase_url": "https://heartbit-c2ae4.firebaseio.com",
+    "project_id": "heartbit-c2ae4",
+    "storage_bucket": "heartbit-c2ae4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:194011181818:android:e7834c3b37b88ff6",
+        "android_client_info": {
+          "package_name": "HeartBit.App"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "194011181818-a63h9stauhu68p9jcb9duesd30tb7fsp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJfGf-i7IC7wq7L859LWO6VpJ_1VRJqgA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

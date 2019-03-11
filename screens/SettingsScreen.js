@@ -1,159 +1,93 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  Alert,
-  Platform
-} from "react-native";
-import { Constants, MapView } from "expo";
-import { logout, clearLoginData } from "../store/actions/actions";
-import MapViewDirections from "../components/MapViewDirections";
+import { View, Text, TouchableOpacity, Linking } from "react-native";
+import geolib from "geolib";
 import { connect } from "react-redux";
 
-// Using a local version here because we need it to import MapView from 'expo'
-
-const { width, height } = Dimensions.get("window");
-const ASPECT_RATIO = width / height;
-const LATITUDE = 37.771707;
-const LONGITUDE = -122.4053769;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-
-const GOOGLE_MAPS_APIKEY = "AIzaSyDPdPljOcPqSqZRJ7wgoa0NKME2iuBXjEg";
-class App extends Component {
+class GeolocationExample extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      coordinates: [
-        {
-          latitude: 37.3317876,
-          longitude: -122.0054812
-        },
-        {
-          latitude: 37.771707,
-          longitude: -122.4053769
-        }
-      ]
+      latitude: null,
+      longitude: null,
+      error: null
     };
-
-    this.mapView = null;
   }
 
-  onMapPress = e => {
-    if (this.state.coordinates.length == 2) {
-      this.setState({
-        coordinates: [e.nativeEvent.coordinate]
-      });
-    } else {
-      this.setState({
-        coordinates: [...this.state.coordinates, e.nativeEvent.coordinate]
-      });
-    }
-  };
-
-  onReady = result => {
-    this.mapView.fitToCoordinates(result.coordinates, {
-      edgePadding: {
-        right: width / 20,
-        bottom: height / 20,
-        left: width / 20,
-        top: height / 20
-      }
-    });
-  };
-
-  onError = errorMessage => {
-    Alert.alert(errorMessage);
-  };
-  _logout = async () => {
-    try {
-      const token = await AsyncStorage.removeItem("token");
-      if (token == null) {
-        this.props.navigation.navigate("Login");
-        this.props.onLogout(this.props.userData);
-        this.props.onClear(this.props.loginData);
-      }
-    } catch (error) {
-      console.log("error on removing data");
-    }
-  };
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null
+        });
+      },
+      error => this.setState({ error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  }
 
   render() {
-    if (Platform.OS === "android") {
-      return (
-        <View style={styles.container}>
-          <Text>
-            {
-              "For some reason Android crashes here on Expo, so you'll have to test this with iOS … Sorry"
-            }
-          </Text>
-        </View>
-      );
-    }
+    geolib.getDistance(
+      { latitude: 51.5103, longitude: 7.49347 },
+      { latitude: "51° 31' N", longitude: "7° 28' E" }
+    );
+    geolib.getDistance(
+      { latitude: 51.5103, longitude: 7.49347 },
+      { latitude: "51° 31' N", longitude: "7° 28' E" }
+    );
+
+    // Working with W3C Geolocation API
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        this.props.defibrillators.map(
+          item => console.log(item.latitude)
+          // alert(
+          //   geolib.getPathLength([
+          //     {
+          //       latitude: position.coords.latitude,
+          //       longitude: position.coords.longitude
+          //     }, // Berlin
+          //     {
+          //       latitude: item.latitude,
+          //       longitude: item.longitude
+          //     }, // Dortmund
+          //     { latitude: 51.503333, longitude: -0.119722 } // London
+          //   ])
+          // )
+        );
+      },
+      function() {
+        alert("Position could not be determined.");
+      },
+      {
+        enableHighAccuracy: true
+      }
+    );
+
+    // in this case set offset to 1 otherwise the nearest point will always be your reference point
 
     return (
-      <View style={styles.container}>
-        <MapView
-          initialRegion={{
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA
-          }}
-          style={StyleSheet.absoluteFill}
-          ref={c => (this.mapView = c)} // eslint-disable-line react/jsx-no-bind
-          onPress={this.onMapPress}
-          loadingEnabled={true}
-        >
-          {this.state.coordinates.map(
-            (coordinate, index) => (
-              <MapView.Marker
-                key={`coordinate_${index}`}
-                coordinate={coordinate}
-              />
-            ) // eslint-disable-line react/no-array-index-key
-          )}
-          {this.state.coordinates.length === 2 && (
-            <MapViewDirections
-              origin={this.state.coordinates[0]}
-              destination={this.state.coordinates[1]}
-              apikey={GOOGLE_MAPS_APIKEY}
-              strokeWidth={3}
-              strokeColor="hotpink"
-              onReady={this.onReady}
-              onError={this.onError}
-            />
-          )}
-        </MapView>
+      <View
+        style={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}
+      >
+        <Text>Latitude: {this.state.latitude}</Text>
+        <Text>Longitude: {this.state.longitude}</Text>
+        <Text>Distance between two points:result </Text>
+        {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: "#ecf0f1"
-  }
-});
-
 const mapStateToProps = state => ({
-  userData: state.loggedInVolunteerData,
-  loginData: state.loginData
-});
-
-const mapDispatchToProps = dispatch => ({
-  onLogout: userData => logout(dispatch, userData),
-  onClear: loginData => clearLoginData(dispatch, loginData)
+  currentLocation: state.currentLocation,
+  defibrillators: state.defibrillators
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
-)(App);
+  null
+)(GeolocationExample);
