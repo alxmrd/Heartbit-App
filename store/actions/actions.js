@@ -6,8 +6,13 @@ import { CLEAR_LOGINDATA } from "../actions/types";
 import { MESSAGE_RECEIVE } from "../actions/types";
 import { MESSAGE_CLEAN } from "../actions/types";
 import { LOGGED_OUT_USER } from "../actions/types";
+import { EVENT_RECEIVE } from "../actions/types";
+import { EVENT_CLEAN } from "../actions/types";
+import { NEAREST_DEFIBRILLATOR } from "../actions/types";
 //import history from "../../history";
 import { AsyncStorage } from "react-native";
+import { Location, Permissions } from "expo";
+
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -67,31 +72,59 @@ export const successLogin = (username, token) => dispatch => {
       alert(error, "SERVER error 500 ");
     });
 };
-export const fetchDefifrillators = token => dispatch => {
-  fetch(`https://alxmrd.com/api/defibrillators`, {
-    headers: {
-      ...headers,
-      Authorization: "Bearer " + token
-    }
-  })
-    .then(result => result.json())
+export const fetchDefifrillators = () => {
+  return async (dispatch, getState) => {
+    var token = await AsyncStorage.getItem("token");
+    await fetch(`https://alxmrd.com/api/defibrillators`, {
+      headers: {
+        ...headers,
+        Authorization: "Bearer " + token
+      }
+    })
+      .then(result => result.json())
 
-    .then(defibrillators =>
-      dispatch({
-        type: FETCH_DEFIBRILLATORS,
-        payload: defibrillators.data
-      })
-    )
-    .catch(error => {
-      alert("Απαιτείται σύνδεση");
-      // history.push("/");
+      .then(defibrillators =>
+        dispatch({
+          type: FETCH_DEFIBRILLATORS,
+          payload: defibrillators.data
+        })
+      )
+      .catch(error => {
+        alert("Απαιτείται σύνδεση");
+        // history.push("/");
+      });
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== "granted") {
+      alert = "H Τοποθεσία ειναι απενεργοποιημένη, μεταβείτε στις ρυθμίσεις!";
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    let currentLocation = location.coords;
+    dispatch({
+      type: CURRENT_LOCATION,
+      payload: currentLocation
     });
-};
-export const currentLocation = (dispatch, currentLocation) => {
-  dispatch({
-    type: CURRENT_LOCATION,
-    payload: currentLocation
-  });
+    const state = getState();
+    // console.log(state);
+    var distances = state.defibrillators.map(item =>
+      geolib.getPathLength([
+        {
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude
+        }, // pou eisai
+        { latitude: item.latitude, longitude: item.longitude }, // 8 apinidwtes
+        { latitude: 40.634781, longitude: 22.94309 } // peristatiko
+      ])
+    );
+    let nearestDefIndex = distances.indexOf(Math.min(...distances));
+
+    let nearestDefibrillator = state.defibrillators[nearestDefIndex];
+
+    dispatch({
+      type: NEAREST_DEFIBRILLATOR,
+      payload: nearestDefibrillator
+    });
+  };
 };
 
 export const messageReceive = (dispatch, data) => {
@@ -101,6 +134,18 @@ export const messageReceive = (dispatch, data) => {
   });
 };
 
+export const eventReceive = (dispatch, data) => {
+  dispatch({
+    type: EVENT_RECEIVE,
+    payload: data
+  });
+};
+export const eventClean = (dispatch, data) => {
+  dispatch({
+    type: EVENT_CLEAN,
+    payload: data
+  });
+};
 export const messageClean = (dispatch, data) => {
   dispatch({
     type: MESSAGE_CLEAN,

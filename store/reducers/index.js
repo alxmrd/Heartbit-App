@@ -4,10 +4,14 @@ import currentLocationReducer from "./currentLocationReducer";
 import defibrillatorsReducer from "./defibrillatorsReducer";
 import loggedInUserReducer from "./loggedInUserReducer";
 import messageReducer from "./messageReducer";
+import eventReducer from "./eventReducer";
+import nearestDefibrillatorReducer from "./nearestDefibrillatorReducer";
 export default combineReducers({
   loginData: loginReducer,
   currentLocation: currentLocationReducer,
   defibrillators: defibrillatorsReducer,
   loggedInVolunteerData: loggedInUserReducer,
-  message: messageReducer
+  message: messageReducer,
+  event: eventReducer,
+  nearestDefibrillator: nearestDefibrillatorReducer
 });

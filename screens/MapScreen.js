@@ -7,24 +7,27 @@ import Pusher from "pusher-js/react-native";
 import getDirections from "react-native-google-maps-directions";
 import { AsyncStorage } from "react-native";
 import { connect } from "react-redux";
+import AnimatedHideView from "react-native-animated-hide-view";
 import {
   fetchDefifrillators,
   messageReceive,
   messageClean,
   logout,
-  clearLoginData
+  clearLoginData,
+  eventReceive,
+  eventClean
 } from "../store/actions/actions";
-import CurrentLocation from "../components/CurrentLocation";
-import SnackBar from "react-native-snackbar-component";
 
-import geolib from "geolib";
+import SnackBar from "react-native-snackbar-component";
 
 class MapScreen extends React.Component {
   constructor(props) {
     super(props);
-    state = {
+    this.state = {
       marker: {},
-      redirect: false
+      redirect: false,
+      isHidden: false,
+      closeSnackBar: false
     };
   }
   static navigationOptions = ({ navigation }) => {
@@ -55,16 +58,7 @@ class MapScreen extends React.Component {
     this.props.navigation.setParams({ logout: this._logout });
     this._getStorageValue();
     Pusher.logToConsole = true;
-    // window.Echo = new Echo({
-    //   broadcaster: Pusher,
-    //   key: "2f7f2a748cacde676705",
-    //   cluster: "eu",
-    //   encrypted: true
-    // });
 
-    // window.Echo.channel("channel").listen("event", e => {
-    //   alert(JSON.stringify(e));
-    // });
     var pusher = new Pusher("2f7f2a748cacde676705", {
       cluster: "eu",
       forceTLS: true
@@ -74,12 +68,16 @@ class MapScreen extends React.Component {
     channel.bind("event", data => {
       this.props.onMessageReceive(data.message);
     });
+    var channel = pusher.subscribe("channel");
+    channel.bind("peristatiko", data => {
+      this.props.onEventReceive(data);
+      this.setState({ isHidden: true, closeSnackBar: true });
+      // this.props.findNearestDef();
+    });
   }
 
   async _getStorageValue() {
-    var token = await AsyncStorage.getItem("token");
-
-    this.props.onfetchDefibrillators(token);
+    this.props.onfetchDefifrillators();
   }
 
   _logout = async () => {
@@ -94,6 +92,7 @@ class MapScreen extends React.Component {
       console.log("error on removing data");
     }
   };
+
   handleGetDirections = () => {
     const data = {
       source: {
@@ -102,8 +101,8 @@ class MapScreen extends React.Component {
       },
 
       destination: {
-        latitude: 37.98381,
-        longitude: 23.727539
+        latitude: this.props.event.latitude,
+        longitude: this.props.event.longitude
       },
 
       params: [
@@ -113,7 +112,7 @@ class MapScreen extends React.Component {
         },
         {
           key: "waypoints",
-          value: "Δαυακη 15 κοζανη" // may be "walking", "bicycling" or "transit" as well
+          value: this.props.nearestDefibrillator.location // may be "walking", "bicycling" or "transit" as well
         },
 
         {
@@ -124,10 +123,15 @@ class MapScreen extends React.Component {
     };
 
     getDirections(data);
+    this.setState({ closeSnackBar: false, isHidden: false });
+  };
+  handleRejection = () => {
+    this.setState({ closeSnackBar: false, isHidden: false });
+    this.props.onEventClean(this.props.event);
   };
 
   render() {
-    const { defibrillators, message } = this.props;
+    const { defibrillators, message, event, addressOfEvent } = this.props;
 
     return (
       <View style={styles.container}>
@@ -149,19 +153,37 @@ class MapScreen extends React.Component {
             title={"Koζάνη"}
             //description={"desss"}
           />
-          <MapView.Marker
-            coordinate={{
-              latitude: this.props.currentLocation.latitude
-                ? this.props.currentLocation.latitude
-                : 0,
-              longitude: this.props.currentLocation.longitude
-                ? this.props.currentLocation.longitude
-                : 0
-            }}
-            title={"Bρίσκεστε εδώ"}
-            //description={"desss"}
-            image={require("../images/marker.png")}
-          />
+          {this.props.currentLocation ? (
+            <MapView.Marker
+              coordinate={{
+                latitude: this.props.currentLocation.latitude
+                  ? this.props.currentLocation.latitude
+                  : 0,
+                longitude: this.props.currentLocation.longitude
+                  ? this.props.currentLocation.longitude
+                  : 0
+              }}
+              title={"Bρίσκεστε εδώ"}
+              //description={"desss"}
+              image={require("../images/marker.png")}
+            />
+          ) : (
+            " "
+          )}
+
+          {event ? (
+            <MapView.Marker
+              coordinate={{
+                latitude: event.latitude,
+                longitude: event.longitude
+              }}
+              title={"Νέο Περιστατικό"}
+              image={require("../images/marker.png")}
+            />
+          ) : (
+            ""
+          )}
+
           {defibrillators.map(item => (
             <MapView.Marker
               key={item.id}
@@ -186,8 +208,36 @@ class MapScreen extends React.Component {
           top={1}
           actionText="x"
         />
-        <CurrentLocation />
-        <Button onPress={this.handleGetDirections} title="Get Directions" />
+        <SnackBar
+          visible={this.state.closeSnackBar}
+          textMessage={"Νέο Περιστατικό:" + "   " + addressOfEvent}
+          actionHandler={() => {
+            this.setState({ closeSnackBar: false });
+          }}
+          position="top"
+          top={1}
+          actionText="x"
+        />
+        {/* <CurrentLocation /> */}
+        <AnimatedHideView visible={this.state.isHidden}>
+          <View style={styles.buttonContainer}>
+            <Button
+              onPress={this.handleGetDirections}
+              title="✓ Aνταπόκριση"
+              style={styles.buttonApprove}
+              buttonStyle={{
+                backgroundColor: "#008081",
+                marginRight: 10
+              }}
+            />
+            <Button
+              onPress={this.handleRejection}
+              title="✗ Aπόρριψη    "
+              style={styles.buttonApprove}
+              buttonStyle={{ backgroundColor: "#C62828" }}
+            />
+          </View>
+        </AnimatedHideView>
       </View>
     );
   }
@@ -209,6 +259,17 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    borderRadius: 10,
+    //alignItems: "center",
+
+    padding: 8,
+    marginLeft: 10,
+
+    marginTop: 50
   }
 });
 
@@ -217,12 +278,18 @@ const mapStateToProps = state => ({
   defibrillators: state.defibrillators,
   message: state.message,
   userData: state.loggedInVolunteerData,
-  loginData: state.loginData
+  loginData: state.loginData,
+  event: state.event,
+  addressOfEvent: state.event.address,
+  nearestDefibrillator: state.nearestDefibrillator
 });
 const mapDispatchToProps = dispatch => ({
-  onfetchDefibrillators: token => dispatch(fetchDefifrillators(token)),
+  onfetchDefifrillators: () => dispatch(fetchDefifrillators()),
   onMessageClean: data => messageClean(dispatch, data),
+  onEventResponse: data => eventResponse(dispatch, data),
   onMessageReceive: data => messageReceive(dispatch, data),
+  onEventReceive: data => eventReceive(dispatch, data),
+  onEventClean: data => eventClean(dispatch, data),
   onLogout: userData => logout(dispatch, userData),
   onClear: loginData => clearLoginData(dispatch, loginData)
 });
