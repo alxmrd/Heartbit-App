@@ -1,9 +1,10 @@
 {
-  "devToolsPort": 19002,
+  "devToolsPort": 19003,
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 21214,
+  "packagerPid": 7359,
   "expoServerNgrokUrl": "https://rv-eua.anonymous.heartbitapp.exp.direct",
   "packagerNgrokUrl": "https://packager.rv-eua.anonymous.heartbitapp.exp.direct",
-  "ngrokPid": 21237
+  "ngrokPid": 7372,
+  "webpackServerPort": null
 }

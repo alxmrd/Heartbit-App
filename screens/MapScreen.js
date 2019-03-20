@@ -72,7 +72,6 @@ class MapScreen extends React.Component {
     channel.bind("peristatiko", data => {
       this.props.onEventReceive(data);
       this.setState({ isHidden: true, closeSnackBar: true });
-      // this.props.findNearestDef();
     });
   }
 
@@ -174,8 +173,8 @@ class MapScreen extends React.Component {
           {event ? (
             <MapView.Marker
               coordinate={{
-                latitude: event.latitude,
-                longitude: event.longitude
+                latitude: event.latitude ? event.latitude : 0,
+                longitude: event.longitude ? event.longitude : 0
               }}
               title={"Νέο Περιστατικό"}
               image={require("../images/marker.png")}

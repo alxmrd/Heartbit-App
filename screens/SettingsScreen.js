@@ -1,93 +1,215 @@
-import React, { Component } from "react";
-import { View, Text, TouchableOpacity, Linking } from "react-native";
-import geolib from "geolib";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Text } from "react-native";
+import { Card, Button } from "react-native-elements";
 import { connect } from "react-redux";
-
-class GeolocationExample extends Component {
+import { AsyncStorage } from "react-native";
+import { ListItem } from "react-native-elements";
+import { logout, clearLoginData } from "../store/actions/actions";
+import { Divider, Avatar } from "react-native-elements";
+class SettingsScreen extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      latitude: null,
-      longitude: null,
-      error: null
+    state = {
+      marker: {},
+      redirect: false
     };
   }
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "Προφίλ",
+      headerStyle: {
+        backgroundColor: "teal"
+      },
+      headerTintColor: "#fff",
+      headerTitleStyle: {
+        fontWeight: "bold",
+        fontFamily: "space-mono"
+      },
+
+      headerRight: (
+        <Button
+          onPress={navigation.getParam("logout")}
+          title="Αποσύνδεση"
+          type="clear"
+          titleStyle={{ fontSize: 14, color: "#fff", fontFamily: "space-mono" }}
+          icon={<Icon name="sign-out" size={15} color="white" />}
+        />
+      )
+    };
+  };
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          error: null
-        });
-      },
-      error => this.setState({ error: error.message }),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
+    this.props.navigation.setParams({ logout: this._logout });
   }
 
-  render() {
-    geolib.getDistance(
-      { latitude: 51.5103, longitude: 7.49347 },
-      { latitude: "51° 31' N", longitude: "7° 28' E" }
-    );
-    geolib.getDistance(
-      { latitude: 51.5103, longitude: 7.49347 },
-      { latitude: "51° 31' N", longitude: "7° 28' E" }
-    );
-
-    // Working with W3C Geolocation API
-
-    navigator.geolocation.getCurrentPosition(
-      function(position) {
-        this.props.defibrillators.map(
-          item => console.log(item.latitude)
-          // alert(
-          //   geolib.getPathLength([
-          //     {
-          //       latitude: position.coords.latitude,
-          //       longitude: position.coords.longitude
-          //     }, // Berlin
-          //     {
-          //       latitude: item.latitude,
-          //       longitude: item.longitude
-          //     }, // Dortmund
-          //     { latitude: 51.503333, longitude: -0.119722 } // London
-          //   ])
-          // )
-        );
-      },
-      function() {
-        alert("Position could not be determined.");
-      },
-      {
-        enableHighAccuracy: true
+  _logout = async () => {
+    try {
+      const token = await AsyncStorage.removeItem("token");
+      if (token == null) {
+        this.props.navigation.navigate("Login");
+        this.props.onLogout(this.props.userData);
+        this.props.onClear(this.props.loginData);
       }
-    );
+    } catch (error) {
+      console.log("error on removing data");
+    }
+  };
 
-    // in this case set offset to 1 otherwise the nearest point will always be your reference point
-
+  render() {
+    const { user } = this.props;
     return (
-      <View
-        style={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}
-      >
-        <Text>Latitude: {this.state.latitude}</Text>
-        <Text>Longitude: {this.state.longitude}</Text>
-        <Text>Distance between two points:result </Text>
-        {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
+      <View>
+        <Card containerStyle={{ padding: 0 }}>
+          <View>
+            <ListItem
+              leftAvatar={
+                <Avatar
+                  rounded
+                  icon={{ name: "account-circle" }}
+                  size="medium"
+                  color="#008080"
+                />
+              }
+              title={
+                <View>
+                  <Text
+                    style={{ color: "black", fontWeight: "bold", fontSize: 20 }}
+                  >
+                    Προφίλ Εθελοντή
+                  </Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 10 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Όνομα Χρήστη</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.username}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Όνομα</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.name}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>Eπώνυμο</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.surname}</Text>
+                </View>
+              }
+            />
+            <Divider
+              style={{ backgroundColor: "blue" }}
+              style={{ marginBottom: 5, marginTop: 5 }}
+            />
+            <ListItem
+              title={
+                <View>
+                  <Text style={styles.titleView}>E-mail</Text>
+                </View>
+              }
+              subtitle={
+                <View>
+                  <Text style={styles.ratingText}>{user.email}</Text>
+                </View>
+              }
+            />
+          </View>
+          <Divider
+            style={{ backgroundColor: "blue" }}
+            style={{ marginBottom: 10, marginTop: 10 }}
+          />
+          {/* <Text style={{ marginBottom: 10 }}>
+            The idea with React Native Elements is more about component
+            structure than actual design.
+          </Text>
+          <Button
+            icon={<Icon name="code" color="#ffffff" />}
+            backgroundColor="#03A9F4"
+            buttonStyle={{
+              borderRadius: 0,
+              marginLeft: 0,
+              marginRight: 0,
+              marginBottom: 0
+            }}
+            title="VIEW NOW"
+          /> */}
+        </Card>
       </View>
     );
   }
 }
 
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
+
+  subtitleView: {
+    flexDirection: "row",
+    paddingLeft: 10,
+    paddingTop: 5
+  },
+  ratingText: {
+    paddingLeft: 10,
+    color: "grey",
+    fontSize: 20
+  },
+  titleView: {
+    color: "teal",
+    paddingLeft: 10,
+    fontWeight: "bold",
+    fontSize: 24
+  }
+});
+
 const mapStateToProps = state => ({
-  currentLocation: state.currentLocation,
-  defibrillators: state.defibrillators
+  user: state.loggedInVolunteerData,
+  userData: state.loggedInVolunteerData,
+  loginData: state.loginData
+});
+
+const mapDispatchToProps = dispatch => ({
+  onLogout: userData => logout(dispatch, userData),
+  onClear: loginData => clearLoginData(dispatch, loginData)
 });
 
 export default connect(
   mapStateToProps,
-  null
-)(GeolocationExample);
+  mapDispatchToProps
+)(SettingsScreen);

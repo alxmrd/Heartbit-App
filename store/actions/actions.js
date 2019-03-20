@@ -12,7 +12,7 @@ import { NEAREST_DEFIBRILLATOR } from "../actions/types";
 //import history from "../../history";
 import { AsyncStorage } from "react-native";
 import { Location, Permissions } from "expo";
-
+import geolib from "geolib";
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -117,9 +117,10 @@ export const fetchDefifrillators = () => {
       ])
     );
     let nearestDefIndex = distances.indexOf(Math.min(...distances));
+    console.log(nearestDefIndex);
 
     let nearestDefibrillator = state.defibrillators[nearestDefIndex];
-
+    console.log(nearestDefibrillator);
     dispatch({
       type: NEAREST_DEFIBRILLATOR,
       payload: nearestDefibrillator
