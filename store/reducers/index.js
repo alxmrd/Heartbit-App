@@ -6,6 +6,7 @@ import loggedInUserReducer from "./loggedInUserReducer";
 import messageReducer from "./messageReducer";
 import eventReducer from "./eventReducer";
 import nearestDefibrillatorReducer from "./nearestDefibrillatorReducer";
+import eventAnswerReducer from "./eventAnswerReducer";
 export default combineReducers({
   loginData: loginReducer,
   currentLocation: currentLocationReducer,
@@ -13,5 +14,6 @@ export default combineReducers({
   loggedInVolunteerData: loggedInUserReducer,
   message: messageReducer,
   event: eventReducer,
-  nearestDefibrillator: nearestDefibrillatorReducer
+  nearestDefibrillator: nearestDefibrillatorReducer,
+  eventAnswer: eventAnswerReducer
 });

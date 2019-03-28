@@ -11,10 +11,14 @@
       "ios",
       "android"
     ],
-    "version": "1.0.0",
+    "version": "5.0.0",
     "orientation": "portrait",
 
- 
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -23,12 +27,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "HeartBit.App"
+      "bundleIdentifier": "com.HeartBit.App"
     },
     "android": {
-      
+      "googleServicesFile": "./google-services.json",
       "package": "com.HeartBit.App",
-      "versionCode":1,
+      "versionCode":5,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -56,21 +60,7 @@
         "com.sec.android.provider.badge.permission.WRITE",
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
       ],
-      "icon":"./app_launcher.png",
-      "splash": {
-        "resizeMode": "contain",
-        "backgroundColor": "#7D7D7D",
-  
-       
-        
-        "mdpi": "./app_launchermdpi.png",   
-        "hdpi": "./app_launcherhdpi.png",   
-        "xhdpi": "./app_launcherxhdpi.png", 
-        "xxhdpi": "./app_launcherxxhdpi.png",
-        "xxxhdpi": "./app_launcherxxxhdpi.png"
-      }
-
-     
-    }
+      "icon":"./assets/images/app_launchermdpi.png"
+     }
   }
 }

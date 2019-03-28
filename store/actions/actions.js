@@ -9,7 +9,9 @@ import { LOGGED_OUT_USER } from "../actions/types";
 import { EVENT_RECEIVE } from "../actions/types";
 import { EVENT_CLEAN } from "../actions/types";
 import { NEAREST_DEFIBRILLATOR } from "../actions/types";
-//import history from "../../history";
+import { EVENT_QUESTION } from "../actions/types";
+import { EVENT_REJECT } from "../actions/types";
+import store from "../store.js";
 import { AsyncStorage } from "react-native";
 import { Location, Permissions } from "expo";
 import geolib from "geolib";
@@ -49,7 +51,7 @@ export const logout = (dispatch, userData) => {
     payload: userData
   });
 };
-export const successLogin = (username, token) => dispatch => {
+export const successLogin = (username, token, expotoken) => dispatch => {
   fetch(`https://alxmrd.com/api/volunteerlogin/success?input=${username}`, {
     method: "GET",
     cache: "no-cache",
@@ -73,7 +75,7 @@ export const successLogin = (username, token) => dispatch => {
     });
 };
 export const fetchDefifrillators = () => {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     var token = await AsyncStorage.getItem("token");
     await fetch(`https://alxmrd.com/api/defibrillators`, {
       headers: {
@@ -99,31 +101,11 @@ export const fetchDefifrillators = () => {
     }
 
     let location = await Location.getCurrentPositionAsync({});
+
     let currentLocation = location.coords;
     dispatch({
       type: CURRENT_LOCATION,
       payload: currentLocation
-    });
-    const state = getState();
-    // console.log(state);
-    var distances = state.defibrillators.map(item =>
-      geolib.getPathLength([
-        {
-          latitude: currentLocation.latitude,
-          longitude: currentLocation.longitude
-        }, // pou eisai
-        { latitude: item.latitude, longitude: item.longitude }, // 8 apinidwtes
-        { latitude: 40.634781, longitude: 22.94309 } // peristatiko
-      ])
-    );
-    let nearestDefIndex = distances.indexOf(Math.min(...distances));
-    console.log(nearestDefIndex);
-
-    let nearestDefibrillator = state.defibrillators[nearestDefIndex];
-    console.log(nearestDefibrillator);
-    dispatch({
-      type: NEAREST_DEFIBRILLATOR,
-      payload: nearestDefibrillator
     });
   };
 };
@@ -140,6 +122,34 @@ export const eventReceive = (dispatch, data) => {
     type: EVENT_RECEIVE,
     payload: data
   });
+
+  let state = store.getState(store);
+  console.log(state);
+  var distances = state.defibrillators.map(item =>
+    geolib.getPathLength([
+      {
+        latitude: state.currentLocation.latitude,
+        longitude: state.currentLocation.longitude
+      }, // pou eisai
+      { latitude: item.latitude, longitude: item.longitude }, // 8 apinidwtes
+      { latitude: state.event.latitude, longitude: state.event.longitude } // peristatiko
+    ])
+  );
+  let nearestDefIndex = distances.indexOf(Math.min(...distances));
+  console.log(nearestDefIndex);
+
+  let nearestDefibrillator = state.defibrillators[nearestDefIndex];
+  console.log(nearestDefibrillator);
+  dispatch({
+    type: NEAREST_DEFIBRILLATOR,
+    payload: nearestDefibrillator
+  });
+
+  let answer = "false";
+  dispatch({
+    type: EVENT_QUESTION,
+    payload: answer
+  });
 };
 export const eventClean = (dispatch, data) => {
   dispatch({
@@ -150,6 +160,14 @@ export const eventClean = (dispatch, data) => {
 export const messageClean = (dispatch, data) => {
   dispatch({
     type: MESSAGE_CLEAN,
+    payload: data
+  });
+};
+
+export const eventReject = dispatch => {
+  let data = "false";
+  dispatch({
+    type: EVENT_REJECT,
     payload: data
   });
 };

@@ -15,7 +15,8 @@ import {
   logout,
   clearLoginData,
   eventReceive,
-  eventClean
+  eventClean,
+  eventReject
 } from "../store/actions/actions";
 
 import SnackBar from "react-native-snackbar-component";
@@ -26,7 +27,7 @@ class MapScreen extends React.Component {
     this.state = {
       marker: {},
       redirect: false,
-      isHidden: false,
+
       closeSnackBar: false
     };
   }
@@ -70,8 +71,9 @@ class MapScreen extends React.Component {
     });
     var channel = pusher.subscribe("channel");
     channel.bind("peristatiko", data => {
+      //this.setState({ isHidden: true, closeSnackBar: true });
+
       this.props.onEventReceive(data);
-      this.setState({ isHidden: true, closeSnackBar: true });
     });
   }
 
@@ -122,15 +124,22 @@ class MapScreen extends React.Component {
     };
 
     getDirections(data);
-    this.setState({ closeSnackBar: false, isHidden: false });
+    this.setState({ closeSnackBar: false });
   };
   handleRejection = () => {
-    this.setState({ closeSnackBar: false, isHidden: false });
+    this.setState({ closeSnackBar: false });
     this.props.onEventClean(this.props.event);
+    this.props.onEventReject();
   };
 
   render() {
-    const { defibrillators, message, event, addressOfEvent } = this.props;
+    const {
+      defibrillators,
+      message,
+      event,
+      addressOfEvent,
+      eventAnswer
+    } = this.props;
 
     return (
       <View style={styles.container}>
@@ -218,7 +227,7 @@ class MapScreen extends React.Component {
           actionText="x"
         />
         {/* <CurrentLocation /> */}
-        <AnimatedHideView visible={this.state.isHidden}>
+        <AnimatedHideView visible={eventAnswer}>
           <View style={styles.buttonContainer}>
             <Button
               onPress={this.handleGetDirections}
@@ -280,10 +289,13 @@ const mapStateToProps = state => ({
   loginData: state.loginData,
   event: state.event,
   addressOfEvent: state.event.address,
-  nearestDefibrillator: state.nearestDefibrillator
+  nearestDefibrillator: state.nearestDefibrillator,
+  eventAnswer: state.eventAnswer
 });
 const mapDispatchToProps = dispatch => ({
   onfetchDefifrillators: () => dispatch(fetchDefifrillators()),
+
+  onEventReject: () => eventReject(dispatch),
   onMessageClean: data => messageClean(dispatch, data),
   onEventResponse: data => eventResponse(dispatch, data),
   onMessageReceive: data => messageReceive(dispatch, data),

@@ -10,9 +10,17 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo";
 import { connect } from "react-redux";
-import { login, successLogin, clearLoginData } from "../store/actions/actions";
+import {
+  login,
+  successLogin,
+  clearLoginData,
+  eventReceive,
+  messageReceive
+} from "../store/actions/actions";
 import { AsyncStorage } from "react-native";
 import SnackBar from "react-native-snackbar-component";
+import Pusher from "pusher-js/react-native";
+import { Notifications } from "expo";
 
 const styles = StyleSheet.create({
   container: {
@@ -76,8 +84,21 @@ class LoginView extends Component {
   };
   componentDidMount() {
     this._getStorageValue();
-    // console.log("id", Expo.Constants.installationId);
-    // console.log("token", Expo.Notifications.getExpoPushTokenAsync());
+    // var pusher = new Pusher("2f7f2a748cacde676705", {
+    //   cluster: "eu",
+    //   forceTLS: true
+    // });
+
+    // var channel = pusher.subscribe("channel");
+    // channel.bind("event", data => {
+    //   this.props.onMessageReceive(data.message);
+    // });
+    // var channel = pusher.subscribe("channel");
+    // channel.bind("peristatiko", data => {
+    //   //this.setState({ isHidden: true, closeSnackBar: true });
+
+    //   this.props.onEventReceive(data);
+    // });
   }
   async _getStorageValue() {
     var token = await AsyncStorage.getItem("token");
@@ -117,6 +138,7 @@ class LoginView extends Component {
       try {
         const token = await AsyncStorage.getItem("token");
         const username = await AsyncStorage.getItem("username");
+
         if (token !== null) {
           this.props.onSuccessLogin(username, token);
 
@@ -218,6 +240,8 @@ const mapDispatchToProps = dispatch => ({
   onLogin: dataPouStelnw => login(dispatch, dataPouStelnw),
   onClear: loginData => clearLoginData(dispatch, loginData),
   onSuccessLogin: (username, token) => dispatch(successLogin(username, token))
+  // onMessageReceive: data => messageReceive(dispatch, data),
+  // onEventReceive: data => eventReceive(dispatch, data)
 });
 
 export default connect(
