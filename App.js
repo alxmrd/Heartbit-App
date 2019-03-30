@@ -1,12 +1,20 @@
 import React from "react";
-import { Platform, StatusBar, StyleSheet, View } from "react-native";
+import {
+  Platform,
+  StatusBar,
+  StyleSheet,
+  View,
+  Alert,
+  Linking
+} from "react-native";
 import { AppLoading, Asset, Font, Icon } from "expo";
 import AppNavigator from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import store from "./store/store";
-import { Header } from "react-native-elements";
+import { Ionicons } from "@expo/vector-icons";
 import { Constants, Notifications, Permissions } from "expo";
 
+import ActionButton from "react-native-action-button";
 global.XMLHttpRequest = global.originalXMLHttpRequest
   ? global.originalXMLHttpRequest
   : global.XMLHttpRequest;
@@ -34,6 +42,24 @@ export default class App extends React.Component {
   state = {
     isLoadingComplete: false
   };
+  _showAlert = () => {
+    Alert.alert(
+      "Τηλέφωνο Άμεσης Βοήθειας ΕΚΑΒ",
+      "Είστε σίγουρος;",
+      [
+        {
+          text: "Nαι",
+          onPress: () => Linking.openURL("tel:+302461029166"),
+          style: "cancel"
+        },
+        {
+          text: "Ακύρωση",
+          onPress: () => console.log("Cancel Pressed")
+        }
+      ],
+      { cancelable: false }
+    );
+  };
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -49,8 +75,28 @@ export default class App extends React.Component {
         <Provider store={store}>
           <View style={styles.container}>
             {Platform.OS === "ios" && <StatusBar barStyle="default" />}
+
             <AppNavigator />
           </View>
+          {Platform.OS === "ios" ? (
+            <ActionButton
+              offsetY={100}
+              size={35}
+              buttonColor="rgba(231,76,60,1)"
+              position="right"
+              onPress={this._showAlert}
+              buttonText="📞"
+            />
+          ) : (
+            <ActionButton
+              offsetY={55}
+              size={35}
+              buttonColor="rgba(231,76,60,1)"
+              position="right"
+              onPress={this._showAlert}
+              buttonText="📞"
+            />
+          )}
         </Provider>
       );
     }

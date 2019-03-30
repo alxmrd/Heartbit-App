@@ -19,8 +19,6 @@ import {
 } from "../store/actions/actions";
 import { AsyncStorage } from "react-native";
 import SnackBar from "react-native-snackbar-component";
-import Pusher from "pusher-js/react-native";
-import { Notifications } from "expo";
 
 const styles = StyleSheet.create({
   container: {

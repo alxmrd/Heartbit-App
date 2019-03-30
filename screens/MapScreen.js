@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
@@ -71,20 +71,25 @@ class MapScreen extends React.Component {
     });
     var channel = pusher.subscribe("channel");
     channel.bind("peristatiko", data => {
-      //this.setState({ isHidden: true, closeSnackBar: true });
+      this.setState({ closeSnackBar: true });
 
       this.props.onEventReceive(data);
     });
   }
 
   async _getStorageValue() {
+    const token = await AsyncStorage.getItem("token");
+    if (token == null) {
+      this.props.navigation.navigate("Login");
+    }
     this.props.onfetchDefifrillators();
   }
 
   _logout = async () => {
     try {
       const token = await AsyncStorage.removeItem("token");
-      if (token == null) {
+      const username = await AsyncStorage.removeItem("username");
+      if (token == null && username == null) {
         this.props.navigation.navigate("Login");
         this.props.onLogout(this.props.userData);
         this.props.onClear(this.props.loginData);
@@ -206,6 +211,7 @@ class MapScreen extends React.Component {
             />
           ))}
         </MapView>
+
         <SnackBar
           visible={message}
           textMessage={"Νέο Μήνυμα:" + "   " + message}
