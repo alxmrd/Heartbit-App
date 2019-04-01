@@ -9,14 +9,26 @@ import { ListItem } from "react-native-elements";
 import { logout, clearLoginData, successLogin } from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
 import NameDialog from "../components/dialogs/NameDialog.js";
-
+import SwitchToggle from "react-native-switch-toggle";
+//import { robotoWeights } from "react-native-typography";
 class ProfileScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       marker: {},
       redirect: false,
-      dialogVisible: false
+      NameDialogVisible: false,
+      SurnameDialogVisible: false,
+      PasswordDialogVisible: false,
+      Tel1DialogVisible: false,
+      Tel2DialogVisible: false,
+      UsernameDialogVisible: false,
+      EmailDialogVisible: false,
+      isOnline: false,
+      AddressDialogVisible: false,
+      switchOn1: false,
+      switchOn2: false,
+      switchOn4: false
     };
   }
 
@@ -29,7 +41,9 @@ class ProfileScreen extends React.Component {
       headerTintColor: "#fff",
       headerTitleStyle: {
         fontWeight: "bold",
-        fontFamily: "space-mono"
+        fontFamily: "space-mono",
+        alignItems: "center",
+        justifyContent: "center"
       },
 
       headerRight: (
@@ -70,14 +84,24 @@ class ProfileScreen extends React.Component {
       console.log("error on removing data");
     }
   };
-  showDialog = () => {
-    this.setState({ dialogVisible: true });
+  showNameDialog = () => {
+    this.setState({ NameDialogVisible: true });
   };
 
   handleCancel = () => {
-    this.setState({ dialogVisible: false });
+    this.setState({ NameDialogVisible: false });
+  };
+  handleTogglePress = () => {
+    this.setState({ isOnline: !this.state.isOnline });
   };
 
+  getRightText() {
+    return this.props.isOnline ? "ΟFF" : "";
+  }
+
+  getLeftText() {
+    return this.props.isOnline ? "" : "ΟN";
+  }
   render() {
     const { user } = this.props;
     return (
@@ -94,7 +118,49 @@ class ProfileScreen extends React.Component {
                     color="#008080"
                   />
                 }
-                // onPress={() => alert("ei")}
+                rightAvatar={
+                  <SwitchToggle
+                    type={1}
+                    buttonStyle={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "absolute"
+                    }}
+                    rightContainerStyle={{
+                      flex: 1,
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                    leftContainerStyle={{
+                      flex: 1,
+                      alignItems: "center",
+                      justifyContent: "flex-start"
+                    }}
+                    backTextRight={this.getRightText()}
+                    backTextLeft={this.getLeftText()}
+                    textRightStyle={{ fontSize: 12 }}
+                    textLeftStyle={{ fontSize: 12 }}
+                    containerStyle={{
+                      marginTop: 16,
+                      width: 90,
+                      height: 35,
+                      borderRadius: 25,
+                      backgroundColor: "#ccc",
+                      padding: 5
+                    }}
+                    circleStyle={{
+                      width: 25,
+                      height: 25,
+                      borderRadius: 19,
+                      backgroundColor: "white" // rgb(102,134,205)
+                    }}
+                    switchOn={user.isOnline}
+                    onPress={this.handleTogglePress}
+                    circleColorOff="#C62828"
+                    circleColorOn="#008080"
+                    duration={500}
+                  />
+                }
                 title={
                   <View>
                     <Text
@@ -151,7 +217,7 @@ class ProfileScreen extends React.Component {
                   </View>
                 }
                 rightAvatar={
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => this.showNameDialog()}>
                     <Avatar
                       rounded
                       icon={{ name: "edit" }}
@@ -203,7 +269,7 @@ class ProfileScreen extends React.Component {
                   </View>
                 }
                 rightAvatar={
-                  <TouchableOpacity onPress={() => this.showDialog()}>
+                  <TouchableOpacity>
                     <Avatar
                       rounded
                       icon={{ name: "edit" }}
@@ -213,26 +279,179 @@ class ProfileScreen extends React.Component {
                   </TouchableOpacity>
                 }
               />
-              {/* <Divider
+              <Divider
                 style={{ backgroundColor: "blue" }}
-                style={{ marginBottom: 10, marginTop: 10 }}
-              /> */}
-              {/* <ListItem
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
                 title={
-       
-                    <Button
-                      icon={<Entypo name="edit" size={15} color="white" />}
-                      title=" Eπεξεργασία Εθελοντή"
-                      onPress={this.showDialog}
+                  <View>
+                    <Text style={styles.titleView}>Kωδικός</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>••••••••••</Text>
+                  </View>
+                }
+                rightAvatar={
+                  <TouchableOpacity>
+                    <Avatar
+                      rounded
+                      icon={{ name: "edit" }}
+                      size="small"
+                      color="#008080"
                     />
                   </TouchableOpacity>
                 }
-              /> */}
+              />
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>Τηλέφωνο</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>{user.tel1}</Text>
+                  </View>
+                }
+                rightAvatar={
+                  <TouchableOpacity>
+                    <Avatar
+                      rounded
+                      icon={{ name: "edit" }}
+                      size="small"
+                      color="#008080"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>Εναλλακτικό Tηλέφωνο</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>
+                      {user.tel2 ? user.tel2 : "Κενό"}
+                    </Text>
+                  </View>
+                }
+                rightAvatar={
+                  <TouchableOpacity>
+                    <Avatar
+                      rounded
+                      icon={{ name: "edit" }}
+                      size="small"
+                      color="#008080"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>Διεύθυνση</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>{user.address}</Text>
+                  </View>
+                }
+                rightAvatar={
+                  <TouchableOpacity>
+                    <Avatar
+                      rounded
+                      icon={{ name: "edit" }}
+                      size="small"
+                      color="#008080"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>Περιφέρεια</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>{user.location}</Text>
+                  </View>
+                }
+                rightAvatar={
+                  <TouchableOpacity>
+                    <Avatar
+                      rounded
+                      icon={{ name: "edit" }}
+                      size="small"
+                      color="#008080"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>Ημερομηνία Γέννησης</Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>{user.dateofbirth}</Text>
+                  </View>
+                }
+              />
+              <Divider
+                style={{ backgroundColor: "blue" }}
+                style={{ marginBottom: 5, marginTop: 5 }}
+              />
+              <ListItem
+                title={
+                  <View>
+                    <Text style={styles.titleView}>
+                      Hμερομηνία Τελευταίας Εκπαίδευσης
+                    </Text>
+                  </View>
+                }
+                subtitle={
+                  <View>
+                    <Text style={styles.ratingText}>{user.latesttraining}</Text>
+                  </View>
+                }
+              />
             </View>
           </Card>
         </View>
         <NameDialog
-          dialogVisibility={this.state.dialogVisible}
+          dialogVisibility={this.state.NameDialogVisible}
           closeDialog={() => this.handleCancel()}
           userData={user}
         />

@@ -44,11 +44,11 @@ const SettingsStack = createStackNavigator({
 });
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: "Ιστορικό",
+  tabBarLabel: "Ρυθμίσεις",
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-time" : "md-time"}
+      name={Platform.OS === "ios" ? "ios-settings" : "md-settings"}
     />
   )
 };

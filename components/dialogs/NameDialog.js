@@ -8,8 +8,8 @@ function NameDialog({ dialogVisibility, closeDialog, userData }) {
       <DialogInput
         isDialogVisible={dialogVisibility}
         title={"Eπεξεργασία Εθελοντή"}
-        message={"E-mail"}
-        initValueTextInput={userData.email}
+        message={"Όνομα"}
+        initValueTextInput={userData.name}
         submitInput={inputText => {
           this.sendInput(inputText);
         }}

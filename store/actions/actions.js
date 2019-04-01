@@ -51,7 +51,7 @@ export const logout = (dispatch, userData) => {
     payload: userData
   });
 };
-export const successLogin = (username, token, expotoken) => dispatch => {
+export const successLogin = (username, token) => dispatch => {
   fetch(`https://alxmrd.com/api/volunteerlogin/success?input=${username}`, {
     method: "GET",
     cache: "no-cache",
