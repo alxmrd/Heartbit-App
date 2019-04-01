@@ -1,5 +1,12 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Linking
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Text } from "react-native";
 import { Card, Button } from "react-native-elements";
@@ -10,7 +17,8 @@ import { logout, clearLoginData, successLogin } from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
 import NameDialog from "../components/dialogs/NameDialog.js";
 import SwitchToggle from "react-native-switch-toggle";
-//import { robotoWeights } from "react-native-typography";
+import ActionButton from "react-native-action-button";
+import { Ionicons } from "@expo/vector-icons";
 class ProfileScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -40,10 +48,10 @@ class ProfileScreen extends React.Component {
       },
       headerTintColor: "#fff",
       headerTitleStyle: {
+        textAlign: "center",
+        flex: 1,
         fontWeight: "bold",
-        fontFamily: "space-mono",
-        alignItems: "center",
-        justifyContent: "center"
+        fontFamily: "space-mono"
       },
 
       headerRight: (
@@ -54,14 +62,55 @@ class ProfileScreen extends React.Component {
           titleStyle={{ fontSize: 14, color: "#fff", fontFamily: "space-mono" }}
           icon={<Icon name="sign-out" size={15} color="white" />}
         />
+      ),
+      headerLeft: (
+        <View>
+          <Button
+            title="    EKAB"
+            type="clear"
+            titleStyle={{
+              fontSize: 14,
+              color: "#fff",
+              fontFamily: "space-mono"
+            }}
+          />
+          <ActionButton
+            offsetY={3}
+            offsetX={5}
+            size={35}
+            buttonColor="rgba(231,76,60,1)"
+            position="left"
+            buttonText="📞"
+            onPress={navigation.getParam("showAlert")}
+          />
+        </View>
       )
     };
   };
-
   componentDidMount() {
     this.props.navigation.setParams({ logout: this._logout });
+    this.props.navigation.setParams({ showAlert: this._showAlert });
     this._getStorageValue();
   }
+  _showAlert = () => {
+    Alert.alert(
+      "Τηλέφωνο Άμεσης Βοήθειας ΕΚΑΒ",
+      "Είστε σίγουρος;",
+      [
+        {
+          text: "Nαι",
+          onPress: () => Linking.openURL("tel:+302461029166"),
+          style: "cancel"
+        },
+        {
+          text: "Ακύρωση",
+          onPress: () => console.log("Cancel Pressed")
+        }
+      ],
+      { cancelable: false }
+    );
+  };
+
   async _getStorageValue() {
     const token = await AsyncStorage.getItem("token");
     const username = await AsyncStorage.getItem("username");

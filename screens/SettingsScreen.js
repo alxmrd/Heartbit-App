@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Alert, Linking } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Text } from "react-native";
 import { Card, Button } from "react-native-elements";
@@ -8,6 +8,7 @@ import { AsyncStorage } from "react-native";
 import { ListItem } from "react-native-elements";
 import { logout, clearLoginData } from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
+import ActionButton from "react-native-action-button";
 class SettingsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -25,7 +26,9 @@ class SettingsScreen extends React.Component {
       headerTintColor: "#fff",
       headerTitleStyle: {
         fontWeight: "bold",
-        fontFamily: "space-mono"
+        fontFamily: "space-mono",
+        textAlign: "center",
+        flex: 1
       },
 
       headerRight: (
@@ -36,13 +39,53 @@ class SettingsScreen extends React.Component {
           titleStyle={{ fontSize: 14, color: "#fff", fontFamily: "space-mono" }}
           icon={<Icon name="sign-out" size={15} color="white" />}
         />
+      ),
+      headerLeft: (
+        <View>
+          <Button
+            title="    EKAB"
+            type="clear"
+            titleStyle={{
+              fontSize: 14,
+              color: "#fff",
+              fontFamily: "space-mono"
+            }}
+          />
+          <ActionButton
+            offsetY={3}
+            offsetX={5}
+            size={35}
+            buttonColor="rgba(231,76,60,1)"
+            position="left"
+            buttonText="📞"
+            onPress={navigation.getParam("showAlert")}
+          />
+        </View>
       )
     };
   };
-
   componentDidMount() {
     this.props.navigation.setParams({ logout: this._logout });
+    this.props.navigation.setParams({ showAlert: this._showAlert });
   }
+  _showAlert = () => {
+    Alert.alert(
+      "Τηλέφωνο Άμεσης Βοήθειας ΕΚΑΒ",
+      "Είστε σίγουρος;",
+      [
+        {
+          text: "Nαι",
+          onPress: () => Linking.openURL("tel:+302461029166"),
+          style: "cancel"
+        },
+        {
+          text: "Ακύρωση",
+          onPress: () => console.log("Cancel Pressed")
+        }
+      ],
+      { cancelable: false }
+    );
+  };
 
   _logout = async () => {
     try {

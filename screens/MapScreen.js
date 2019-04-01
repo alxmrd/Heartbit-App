@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, Linking } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
@@ -18,6 +18,7 @@ import {
   eventClean,
   eventReject
 } from "../store/actions/actions";
+import ActionButton from "react-native-action-button";
 
 import SnackBar from "react-native-snackbar-component";
 
@@ -40,7 +41,9 @@ class MapScreen extends React.Component {
       headerTintColor: "#fff",
       headerTitleStyle: {
         fontWeight: "bold",
-        fontFamily: "space-mono"
+        fontFamily: "space-mono",
+        textAlign: "center",
+        flex: 1
       },
 
       headerRight: (
@@ -51,11 +54,34 @@ class MapScreen extends React.Component {
           titleStyle={{ fontSize: 14, color: "#fff", fontFamily: "space-mono" }}
           icon={<Icon name="sign-out" size={15} color="white" />}
         />
+      ),
+      headerLeft: (
+        <View>
+          <Button
+            title="    EKAB"
+            type="clear"
+            titleStyle={{
+              fontSize: 14,
+              color: "#fff",
+              fontFamily: "space-mono"
+            }}
+          />
+          <ActionButton
+            offsetY={3}
+            offsetX={5}
+            size={35}
+            buttonColor="rgba(231,76,60,1)"
+            position="left"
+            buttonText="📞"
+            onPress={navigation.getParam("showAlert")}
+          />
+        </View>
       )
     };
   };
 
   componentDidMount() {
+    this.props.navigation.setParams({ showAlert: this._showAlert });
     this.props.navigation.setParams({ logout: this._logout });
     this._getStorageValue();
     Pusher.logToConsole = true;
@@ -76,7 +102,24 @@ class MapScreen extends React.Component {
       this.props.onEventReceive(data);
     });
   }
-
+  _showAlert = () => {
+    Alert.alert(
+      "Τηλέφωνο Άμεσης Βοήθειας ΕΚΑΒ",
+      "Είστε σίγουρος;",
+      [
+        {
+          text: "Nαι",
+          onPress: () => Linking.openURL("tel:+302461029166"),
+          style: "cancel"
+        },
+        {
+          text: "Ακύρωση",
+          onPress: () => console.log("Cancel Pressed")
+        }
+      ],
+      { cancelable: false }
+    );
+  };
   async _getStorageValue() {
     const token = await AsyncStorage.getItem("token");
     if (token == null) {
