@@ -9,7 +9,7 @@ function TelDialog({ dialogVisibility, closeDialog, userData }) {
         isDialogVisible={dialogVisibility}
         title={"Eπεξεργασία Εθελοντή"}
         message={"Τηλέφωνο"}
-        initValueTextInput={userData.tel1}
+        initValueTextInput={userData.tel}
         submitInput={inputText => {
           this.sendInput(inputText);
         }}
