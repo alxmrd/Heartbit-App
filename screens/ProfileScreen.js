@@ -14,7 +14,12 @@ import { Card, Button } from "react-native-elements";
 import { connect } from "react-redux";
 import { AsyncStorage } from "react-native";
 import { ListItem } from "react-native-elements";
-import { logout, clearLoginData, successLogin } from "../store/actions/actions";
+import {
+  logout,
+  clearLoginData,
+  successLogin,
+  clearMessage
+} from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
 import NameDialog from "../components/dialogs/NameDialog.js";
 import SurnameDialog from "../components/dialogs/SurnameDialog.js";
@@ -27,7 +32,7 @@ import LocationDialog from "../components/dialogs/LocationDialog.js";
 import EmailDialog from "../components/dialogs/EmailDialog.js";
 import SwitchToggle from "react-native-switch-toggle";
 import ActionButton from "react-native-action-button";
-
+import SnackBar from "react-native-snackbar-component";
 class ProfileScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -196,7 +201,7 @@ class ProfileScreen extends React.Component {
     const { user } = this.props;
     return (
       <ScrollView>
-        {user ? (
+        {user.name ? (
           <View>
             <Card containerStyle={{ padding: 0 }}>
               <View>
@@ -588,10 +593,20 @@ class ProfileScreen extends React.Component {
               closeDialog={() => this.handleCancel()}
               userData={user}
             />
+            <SnackBar
+              visible={this.props.errorMessage.httpstatus === "error"}
+              textMessage={this.props.errorMessage.message}
+              actionHandler={() => {
+                this.props.onClearMessage(this.props.errorMessage);
+              }}
+              top={1}
+              position="top"
+              actionText="x"
+            />
           </View>
         ) : (
-          <View style={[styles.container, styles.horizontal]}>
-            <ActivityIndicator size="large" color="#0000ff" />
+          <View style={[styles.loading, styles.horizontal]}>
+            <ActivityIndicator size="large" color="#008080" />
           </View>
         )}
       </ScrollView>
@@ -606,10 +621,17 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center"
   },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignSelf: "center",
+    flexDirection: "row"
+  },
   horizontal: {
-    flexDirection: "row",
+    margin: 200,
     justifyContent: "space-around",
-    padding: 10
+    padding: 10,
+    flexDirection: "column"
   },
   subtitleView: {
     flexDirection: "row",
@@ -638,13 +660,15 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => ({
   user: state.loggedInVolunteerData,
   userData: state.loggedInVolunteerData,
-  loginData: state.loginData
+  loginData: state.loginData,
+  errorMessage: state.errorMessage
 });
 
 const mapDispatchToProps = dispatch => ({
   onLogout: userData => logout(dispatch, userData),
   onClear: loginData => clearLoginData(dispatch, loginData),
-  onSuccessLogin: (username, token) => dispatch(successLogin(username, token))
+  onSuccessLogin: (username, token) => dispatch(successLogin(username, token)),
+  onClearMessage: message => clearMessage(dispatch, message)
 });
 
 export default connect(

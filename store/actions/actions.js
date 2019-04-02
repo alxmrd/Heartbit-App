@@ -11,6 +11,9 @@ import { EVENT_CLEAN } from "../actions/types";
 import { NEAREST_DEFIBRILLATOR } from "../actions/types";
 import { EVENT_QUESTION } from "../actions/types";
 import { EVENT_REJECT } from "../actions/types";
+import { UPDATE_VOLUNTEER } from "../actions/types";
+import { ISINVALID } from "../actions/types";
+import { CLEAR_ISINVALID } from "../actions/types";
 import store from "../store.js";
 import { AsyncStorage } from "react-native";
 import { Location, Permissions } from "expo";
@@ -109,7 +112,40 @@ export const fetchDefifrillators = () => {
     });
   };
 };
-
+export const changePassword = userData => {
+  return async dispatch => {
+    var token = await AsyncStorage.getItem("token");
+    await fetch(`https://alxmrd.com/api/mobile/changepassword`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        Authorization: "Bearer " + token
+      },
+      body: JSON.stringify(userData)
+    })
+      .then(result => result.json())
+      .then(res => {
+        res.httpstatus === "error"
+          ? dispatch({
+              type: ISINVALID,
+              payload: res
+            })
+          : dispatch({
+              type: UPDATE_VOLUNTEER,
+              payload: res
+            });
+      })
+      .catch(error => {
+        alert(error, "SERVER error 500 ");
+      });
+  };
+};
+export const clearMessage = (dispatch, message) => {
+  dispatch({
+    type: CLEAR_ISINVALID,
+    payload: message
+  });
+};
 export const messageReceive = (dispatch, data) => {
   dispatch({
     type: MESSAGE_RECEIVE,

@@ -8,6 +8,7 @@ import Dialog, {
   DialogButton,
   DialogFooter
 } from "react-native-popup-dialog";
+import { changePassword, clearMessage } from "../../store/actions/actions";
 
 class PasswordDialog extends React.Component {
   state = {
@@ -29,7 +30,6 @@ class PasswordDialog extends React.Component {
 
   checkPassword = () => {
     if (this.state.password !== this.props.userData.password) {
-      console.log(this.props.userData.password);
       this.setState({ error: "Λάθος Κωδικός" });
     }
     if (this.state.password == this.props.userData.password) {
@@ -40,10 +40,20 @@ class PasswordDialog extends React.Component {
     if (this.state.newPassword !== this.state.newPasswordConfirmation) {
       this.setState({ errorNew: "O κωδικός δεν ταιρίαζει" });
     }
-    if (this.state.newPassword == this.state.newPasswordConfirmation) {
-      this.setState({ error: "" });
+    if (
+      this.state.newPassword == this.state.newPasswordConfirmation &&
+      this.state.error == ""
+    ) {
+      this.setState({ errorNew: "" });
+      const dataPouStelnw = {
+        id: this.props.userData.id,
+        password: this.state.newPassword
+      };
+      this.props.onChangePassword(dataPouStelnw);
+      this.props.closeDialog();
     }
   };
+
   render() {
     let { password, newPassword, newPasswordConfirmation } = this.state;
     const { dialogVisibility, closeDialog, userData } = this.props;
@@ -85,6 +95,9 @@ class PasswordDialog extends React.Component {
               secureTextEntry={true}
               value={newPasswordConfirmation}
               error={this.state.errorNew}
+              onChangeText={newPasswordConfirmation =>
+                this.setState({ newPasswordConfirmation })
+              }
             />
           </DialogContent>
         </Dialog>
@@ -94,7 +107,14 @@ class PasswordDialog extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  user: state.loggedInVolunteerData
+  user: state.loggedInVolunteerData,
+  errorMessage: state.errorMessage
+});
+const mapDispatchToProps = dispatch => ({
+  onChangePassword: userData => dispatch(changePassword(userData))
 });
 
-export default connect(mapStateToProps)(PasswordDialog);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PasswordDialog);
