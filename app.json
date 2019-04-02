@@ -15,9 +15,9 @@
     "orientation": "portrait",
 
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/app_launcherxxxhdpi.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#efe6d5"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
