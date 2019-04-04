@@ -224,6 +224,35 @@ export const changeLocation = userData => {
       });
   };
 };
+
+export const changeName = userData => {
+  return async dispatch => {
+    var token = await AsyncStorage.getItem("token");
+    await fetch(`https://alxmrd.com/api/mobile/changename`, {
+      method: "POST",
+      headers: {
+        ...headers,
+        Authorization: "Bearer " + token
+      },
+      body: JSON.stringify(userData)
+    })
+      .then(result => result.json())
+      .then(res => {
+        res.httpstatus === "error"
+          ? dispatch({
+              type: ISINVALID,
+              payload: res
+            })
+          : dispatch({
+              type: UPDATE_VOLUNTEER,
+              payload: res
+            });
+      })
+      .catch(error => {
+        alert(error, "SERVER error 500 ");
+      });
+  };
+};
 export const clearMessage = (dispatch, message) => {
   dispatch({
     type: CLEAR_ISINVALID,
