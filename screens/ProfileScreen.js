@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   horizontal: {
-    margin: 200,
+    margin: 250,
     justifyContent: "space-around",
     padding: 10,
     flexDirection: "column"
