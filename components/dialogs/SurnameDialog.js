@@ -19,7 +19,7 @@ class SurnameDialog extends React.Component {
         <DialogInput
           isDialogVisible={dialogVisibility}
           title={"Eπεξεργασία Εθελοντή"}
-          message={"Όνομα"}
+          message={"Eπώνυμο"}
           initValueTextInput={userData.surname}
           submitInput={inputText => {
             this.handleSubmit(inputText);
