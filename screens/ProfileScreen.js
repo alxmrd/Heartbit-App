@@ -18,7 +18,8 @@ import {
   logout,
   clearLoginData,
   successLogin,
-  clearMessage
+  clearMessage,
+  changeUserActivity
 } from "../store/actions/actions";
 import { Divider, Avatar } from "react-native-elements";
 import NameDialog from "../components/dialogs/NameDialog.js";
@@ -49,9 +50,7 @@ class ProfileScreen extends React.Component {
       isOnline: false,
       AddressDialogVisible: false,
       LocationDialogVisible: false,
-      switchOn1: false,
-      switchOn2: false,
-      switchOn4: false
+    
     };
   }
 
@@ -193,8 +192,13 @@ class ProfileScreen extends React.Component {
       AddressDialogVisible: false
     });
   };
-  handleTogglePress = () => {
-    this.setState({ isOnline: !this.state.isOnline });
+handleUserActivity = () => {
+  const dataPouStelnw = {
+    id: this.props.user.id,
+    isOnline: !this.props.user.isOnline
+  };
+  
+    this.props.onChangeUserActivity(dataPouStelnw)
   };
 
   render() {
@@ -252,7 +256,7 @@ class ProfileScreen extends React.Component {
                         backgroundColor: "white" // rgb(102,134,205)
                       }}
                       switchOn={user.isOnline}
-                      onPress={this.handleTogglePress}
+                      onPress={this.handleUserActivity}
                       circleColorOff="#C62828"
                       circleColorOn="#008080"
                       duration={500}
@@ -668,7 +672,8 @@ const mapDispatchToProps = dispatch => ({
   onLogout: userData => logout(dispatch, userData),
   onClear: loginData => clearLoginData(dispatch, loginData),
   onSuccessLogin: (username, token) => dispatch(successLogin(username, token)),
-  onClearMessage: message => clearMessage(dispatch, message)
+  onClearMessage: message => clearMessage(dispatch, message),
+  onChangeUserActivity: userData => dispatch(changeUserActivity(userData))
 });
 
 export default connect(
