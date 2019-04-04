@@ -8,7 +8,7 @@ import Dialog, {
   DialogButton,
   DialogFooter
 } from "react-native-popup-dialog";
-import { changePassword, clearMessage } from "../../store/actions/actions";
+import { changePassword } from "../../store/actions/actions";
 
 class PasswordDialog extends React.Component {
   state = {
