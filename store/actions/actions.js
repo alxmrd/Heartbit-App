@@ -448,6 +448,12 @@ export const eventClean = (dispatch, data) => {
     payload: data
   });
 };
+export const eventAnswer = (dispatch, data) => {
+  dispatch({
+    type: EVENT_ANSWER,
+    payload: data
+  });
+};
 export const messageClean = (dispatch, data) => {
   dispatch({
     type: MESSAGE_CLEAN,

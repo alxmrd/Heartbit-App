@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Alert, Linking } from "react-native";
+import { View, StyleSheet, Alert, Linking, Text } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { MapView } from "expo";
 import { Button } from "react-native-elements";
@@ -7,7 +7,13 @@ import Pusher from "pusher-js/react-native";
 import getDirections from "react-native-google-maps-directions";
 import { AsyncStorage } from "react-native";
 import { connect } from "react-redux";
-import AnimatedHideView from "react-native-animated-hide-view";
+import Dialog, {
+  DialogContent,
+  DialogTitle,
+  DialogButton,
+  DialogFooter,
+  ScaleAnimation
+} from "react-native-popup-dialog";
 import {
   fetchDefifrillators,
   messageReceive,
@@ -16,10 +22,10 @@ import {
   clearLoginData,
   eventReceive,
   eventClean,
-  eventReject
+  eventReject,
+  eventQuestionAnswered
 } from "../store/actions/actions";
 import ActionButton from "react-native-action-button";
-
 import SnackBar from "react-native-snackbar-component";
 
 class MapScreen extends React.Component {
@@ -27,9 +33,7 @@ class MapScreen extends React.Component {
     super(props);
     this.state = {
       marker: {},
-      redirect: false,
-
-      closeSnackBar: false
+      redirect: false
     };
   }
   static navigationOptions = ({ navigation }) => {
@@ -97,8 +101,6 @@ class MapScreen extends React.Component {
     });
     var channel = pusher.subscribe("channel");
     channel.bind("peristatiko", data => {
-      this.setState({ closeSnackBar: true });
-
       this.props.onEventReceive(data);
     });
   }
@@ -172,10 +174,9 @@ class MapScreen extends React.Component {
     };
 
     getDirections(data);
-    this.setState({ closeSnackBar: false });
+    this.props.onEventQuestionAnswered(this.props.eventAnswer);
   };
   handleRejection = () => {
-    this.setState({ closeSnackBar: false });
     this.props.onEventClean(this.props.event);
     this.props.onEventReject();
   };
@@ -254,7 +255,35 @@ class MapScreen extends React.Component {
             />
           ))}
         </MapView>
-
+        <Dialog
+          width={0.8}
+          visible={eventAnswer}
+          dialogAnimation={
+            new ScaleAnimation({
+              initialValue: 0, // optional
+              useNativeDriver: true // optional
+            })
+          }
+          footer={
+            <DialogFooter>
+              <DialogButton
+                text="Απόρριψη"
+                onPress={() => this.handleRejection()}
+                textStyle={(color = "#C62828")}
+              />
+              <DialogButton
+                text="Ανταπόκριση"
+                onPress={() => this.handleGetDirections()}
+                textStyle={(color = "#008080")}
+              />
+            </DialogFooter>
+          }
+          dialogTitle={<DialogTitle title="Nέο Περιστατικό" />}
+        >
+          <DialogContent>
+            <Text style={styles.text}>{addressOfEvent}</Text>
+          </DialogContent>
+        </Dialog>
         <SnackBar
           visible={message}
           textMessage={"Νέο Μήνυμα:" + "   " + message}
@@ -265,36 +294,6 @@ class MapScreen extends React.Component {
           top={1}
           actionText="x"
         />
-        <SnackBar
-          visible={this.state.closeSnackBar}
-          textMessage={"Νέο Περιστατικό:" + "   " + addressOfEvent}
-          actionHandler={() => {
-            this.setState({ closeSnackBar: false });
-          }}
-          position="top"
-          top={1}
-          actionText="x"
-        />
-        {/* <CurrentLocation /> */}
-        <AnimatedHideView visible={eventAnswer}>
-          <View style={styles.buttonContainer}>
-            <Button
-              onPress={this.handleGetDirections}
-              title="✓ Aνταπόκριση"
-              style={styles.buttonApprove}
-              buttonStyle={{
-                backgroundColor: "#008081",
-                marginRight: 10
-              }}
-            />
-            <Button
-              onPress={this.handleRejection}
-              title="✗ Aπόρριψη    "
-              style={styles.buttonApprove}
-              buttonStyle={{ backgroundColor: "#C62828" }}
-            />
-          </View>
-        </AnimatedHideView>
       </View>
     );
   }
@@ -316,6 +315,10 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0
+  },
+  text: {
+    textAlign: "center",
+    fontWeight: "bold"
   },
   buttonContainer: {
     flex: 1,
@@ -346,6 +349,7 @@ const mapDispatchToProps = dispatch => ({
 
   onEventReject: () => eventReject(dispatch),
   onMessageClean: data => messageClean(dispatch, data),
+  onEventQuestionAnswered: data => eventQuestionAnswered(dispatch, data),
   onEventResponse: data => eventResponse(dispatch, data),
   onMessageReceive: data => messageReceive(dispatch, data),
   onEventReceive: data => eventReceive(dispatch, data),
