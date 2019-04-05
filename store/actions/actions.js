@@ -10,14 +10,16 @@ import { EVENT_RECEIVE } from "../actions/types";
 import { EVENT_CLEAN } from "../actions/types";
 import { NEAREST_DEFIBRILLATOR } from "../actions/types";
 import { EVENT_QUESTION } from "../actions/types";
-import { EVENT_REJECT } from "../actions/types";
+import { EVENT_QUESTION_ANSWERED } from "../actions/types";
 import { UPDATE_VOLUNTEER } from "../actions/types";
 import { ISINVALID } from "../actions/types";
+import { EVENT_REJECT } from "../actions/types";
 import { CLEAR_ISINVALID } from "../actions/types";
 import store from "../store.js";
 import { AsyncStorage } from "react-native";
 import { Location, Permissions } from "expo";
 import geolib from "geolib";
+
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
@@ -415,7 +417,7 @@ export const eventReceive = (dispatch, data) => {
   });
 
   let state = store.getState(store);
-  console.log(state);
+
   var distances = state.defibrillators.map(item =>
     geolib.getPathLength([
       {
@@ -427,10 +429,9 @@ export const eventReceive = (dispatch, data) => {
     ])
   );
   let nearestDefIndex = distances.indexOf(Math.min(...distances));
-  console.log(nearestDefIndex);
 
   let nearestDefibrillator = state.defibrillators[nearestDefIndex];
-  console.log(nearestDefibrillator);
+
   dispatch({
     type: NEAREST_DEFIBRILLATOR,
     payload: nearestDefibrillator
@@ -452,6 +453,25 @@ export const eventAnswer = (dispatch, data) => {
   dispatch({
     type: EVENT_ANSWER,
     payload: data
+  });
+};
+export const eventQuestionAnswered = (
+  dispatch,
+  data,
+  nearestDefibrillator,
+  token
+) => {
+  dispatch({
+    type: EVENT_QUESTION_ANSWERED,
+    payload: data
+  });
+  fetch(`https://alxmrd.com/mobile/unlockDefibrillator`, {
+    method: "POST",
+    headers: {
+      ...headers,
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify(nearestDefibrillator)
   });
 };
 export const messageClean = (dispatch, data) => {

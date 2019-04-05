@@ -1,9 +1,9 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": null,
-  "packagerPort": null,
-  "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null
+  "expoServerPort": 19000,
+  "packagerPort": 19001,
+  "packagerPid": 1783,
+  "expoServerNgrokUrl": "https://q3-jzw.anonymous.heartbitapp.exp.direct",
+  "packagerNgrokUrl": "https://packager.q3-jzw.anonymous.heartbitapp.exp.direct",
+  "ngrokPid": 1812
 }

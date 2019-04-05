@@ -174,8 +174,17 @@ class MapScreen extends React.Component {
     };
 
     getDirections(data);
-    this.props.onEventQuestionAnswered(this.props.eventAnswer);
+    this._getToken();
   };
+  async _getToken() {
+    const token = await AsyncStorage.getItem("token");
+    this.props.onEventQuestionAnswered(
+      this.props.eventAnswer,
+      this.props.nearestDefibrillator,
+      token
+    );
+  }
+
   handleRejection = () => {
     this.props.onEventClean(this.props.event);
     this.props.onEventReject();
@@ -349,7 +358,8 @@ const mapDispatchToProps = dispatch => ({
 
   onEventReject: () => eventReject(dispatch),
   onMessageClean: data => messageClean(dispatch, data),
-  onEventQuestionAnswered: data => eventQuestionAnswered(dispatch, data),
+  onEventQuestionAnswered: (data, nearestDefibrillator, token) =>
+    eventQuestionAnswered(dispatch, data, nearestDefibrillator, token),
   onEventResponse: data => eventResponse(dispatch, data),
   onMessageReceive: data => messageReceive(dispatch, data),
   onEventReceive: data => eventReceive(dispatch, data),
